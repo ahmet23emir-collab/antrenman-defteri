@@ -411,6 +411,28 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
 .nudge { display: grid; gap: 10px; justify-items: start; }
 .nudge p { margin: 0; color: var(--ink-2); font-size: .92rem; line-height: 1.45; max-width: 46ch; }
 .nudge .btn { width: auto; }
+/* GÖREV 6: İlerleme */
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; }
+.seg button { appearance: none; cursor: pointer; min-height: 2.75rem; border: 0; border-radius: 9px; background: transparent; color: var(--ink-2); font: inherit; font-weight: 600; font-size: .92rem; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.seg.sm { padding: 3px; flex: none; }
+.seg.sm button { min-width: 5.5rem; font-size: .85rem; }
+.prog-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.pchip { display: inline-flex; align-items: center; gap: 6px; font-size: .85rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.pchip i { width: 10px; height: 10px; border-radius: 50%; background: var(--ink-2); flex: none; }
+.pchip.up i { background: var(--done); }
+.pchip.stall i { background: var(--warn); }
+.pchip.few i { background: transparent; box-shadow: inset 0 0 0 2px var(--ink-2); }
+.sum-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sum-grid span br + * { display: block; }
+.ch-lab { fill: var(--ink); font-size: 12px; font-weight: 600; font-family: var(--font-body); }
+.plist { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: .9rem; font-variant-numeric: tabular-nums; }
+.plist li span { display: inline-block; min-width: 3.6rem; color: var(--ink-2); }
+.pxrow { appearance: none; cursor: pointer; width: 100%; min-height: 2.75rem; display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; font: inherit; color: var(--ink); background: transparent; border: 0; border-top: 1px solid var(--line); padding: 8px 2px; }
+.pxrow[aria-pressed="true"] .pxn b { text-decoration: underline; text-underline-offset: 3px; }
+.pxn { display: grid; gap: 1px; min-width: 0; }
+.pxn b { font-weight: 600; font-size: .95rem; }
+.pxn span { font-size: .8rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
@@ -574,7 +596,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
           var k = e.id + '|' + p;
           if (seen[k]) { return; }
           seen[k] = true;
-          ALL_EX.push({ key: k, id: e.id, p: p, name: pn, bw: e.bw, type: d.type });
+          ALL_EX.push({ key: k, id: e.id, p: p, name: pn, bw: e.bw, type: d.type, ex: e });
         });
       });
     });
@@ -890,13 +912,26 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     return null;
   }
   /* best estimated 1RM for an exercise part, from every session except `doc` */
-  function bestBefore(exId, p, doc) {
-    var me = keyOf(doc.date, doc.s), best = 0;
+  /* best estimated-1RM set for an exercise part across all sessions except `exceptKey` (shared by the record tag and İlerleme) */
+  function bestSet(exId, p, exceptKey) {
+    var b = { v: 0, date: null, w: 0, r: 0 };
     liveDocs().forEach(function (d) {
-      if (keyOf(d.date, d.s) === me || !d.sets || !d.sets[exId]) { return; }
-      d.sets[exId].forEach(function (s) { if (s.d && s.w[p] && s.r[p]) { best = Math.max(best, e1rm(s.w[p], s.r[p])); } });
+      if (keyOf(d.date, d.s) === exceptKey || !d.sets || !d.sets[exId]) { return; }
+      d.sets[exId].forEach(function (s) {
+        if (s.d && s.w[p] && s.r[p]) { var v = e1rm(s.w[p], s.r[p]); if (v > b.v) { b = { v: v, date: d.date, w: s.w[p], r: s.r[p] }; } }
+      });
     });
-    return best;
+    return b;
+  }
+  function bestBefore(exId, p, doc) { return bestSet(exId, p, keyOf(doc.date, doc.s)).v; }
+  /* double progression: every set done and at the top of the rep range (shared by the set card hint and İlerleme) */
+  function hitTop(e, arr) {
+    if (!e.reps || !arr.length) { return false; }
+    return arr.every(function (s) {
+      if (!s.d) { return false; }
+      for (var p = 0; p < e.parts.length; p++) { if (s.r[p] === null || s.r[p] === undefined || s.r[p] < e.reps[1]) { return false; } }
+      return true;
+    });
   }
   /* coaching for one finished set: was the weight right for the target reps? */
   function adviceFor(e, s, leg) {
@@ -1043,6 +1078,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
   var cur = null;
   var suppEdit = false;
   var progKey = ALL_EX[0].key;
+  var histView = 'seans', progRange = '12';
   var needsRender = false;
   var vd = today; /* the day shown on the Beslenme and Takviye tabs */
   var editKey = null; /* a past session opened from Geçmiş for editing */
@@ -1151,7 +1187,8 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
   /* ================= chart ================= */
   function lineChart(pts, unit, color) {
     if (!pts.length) { return ''; }
-    var W = 320, H = 150, L = 38, R = 12, T = 12, B = 24;
+    var labs = pts.some(function (q) { return q.lab !== undefined && q.lab !== ''; });
+    var W = 320, H = 150, L = 38, R = 12, T = labs ? 26 : 12, B = 24;
     var ys = pts.map(function (p) { return p.y; });
     var lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
     if (hi - lo < 1) { lo -= 1; hi += 1; }
@@ -1174,6 +1211,13 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
       if (i === pts.length - 1) { return; }
       h += '<circle class="ch-dot" r="2.2" cx="' + X(p.x).toFixed(1) + '" cy="' + Y(p.y).toFixed(1) + '"/>';
     });
+    if (labs) {
+      var stride = Math.ceil(pts.length / 12);
+      pts.forEach(function (q, i) {
+        if (q.lab === undefined || q.lab === '' || ((pts.length - 1 - i) % stride)) { return; }
+        h += '<text class="ch-lab" x="' + X(q.x).toFixed(1) + '" y="' + (Y(q.y) - 9).toFixed(1) + '" text-anchor="middle">' + esc(String(q.lab)) + '</text>';
+      });
+    }
     var lp = pts[pts.length - 1];
     h += '<circle class="ch-end" r="4.5" cx="' + X(lp.x).toFixed(1) + '" cy="' + Y(lp.y).toFixed(1) + '"/>';
     h += '<text class="ch-txt" x="' + L + '" y="' + (H - 6) + '">' + shortDate(pts[0].x) + '</text>';
@@ -1254,17 +1298,21 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     return parts.length ? '<p class="goal"><b>Bugünkü hedef</b> ' + parts.join('  |  ') + '</p>' : '';
   }
   /* no progress across the last three sessions of a lift */
-  function stallLine(e, doc) {
-    if (e.bw) { return ''; }
-    var me = keyOf(doc.date, doc.s), pts = [];
-    liveDocs().filter(function (d) { return keyOf(d.date, d.s) !== me && d.sets && d.sets[e.id]; })
+  /* stall rule: no estimated-1RM progress across the last three sessions (shared by the set card and İlerleme) */
+  function isStalled(e, exceptKey) {
+    if (e.bw) { return false; }
+    var pts = [];
+    liveDocs().filter(function (d) { return keyOf(d.date, d.s) !== exceptKey && d.sets && d.sets[e.id]; })
       .sort(function (a, b) { return a.date < b.date ? 1 : -1; })
       .forEach(function (d) {
         var v = 0;
         d.sets[e.id].forEach(function (s) { if (s.d && s.w[0] && s.r[0]) { v = Math.max(v, e1rm(s.w[0], s.r[0])); } });
         if (v) { pts.push(v); }
       });
-    if (pts.length < 3 || pts[0] > pts[2] + 0.01 || pts[1] > pts[2] + 0.01) { return ''; }
+    return !(pts.length < 3 || pts[0] > pts[2] + 0.01 || pts[1] > pts[2] + 0.01);
+  }
+  function stallLine(e, doc) {
+    if (!isStalled(e, keyOf(doc.date, doc.s))) { return ''; }
     return '<p class="goal stall"><b>3 seanstır ilerleme yok.</b> Kiloyu %10 düşür, tekrarları üst sınıra çıkar ve oradan yeniden yüklen. Uykunu ve kalorini de kontrol et.</p>';
   }
   function trainWeeks() {
@@ -1367,13 +1415,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     }
     card.querySelectorAll('input.in').forEach(function (inp) { inp.classList.toggle('auto', inp.getAttribute('data-auto') === '1'); });
     var hint = card.querySelector('.hint');
-    var show = false;
-    if (all && e.reps) {
-      show = arr.every(function (s) {
-        for (var p = 0; p < e.parts.length; p++) { if (s.r[p] === null || s.r[p] < e.reps[1]) { return false; } }
-        return true;
-      });
-    }
+    var show = hitTop(e, arr);
     if (show) {
       var leg = PROGRAM[sel].type === 'leg';
       hint.textContent = 'Tüm setlerde ' + e.reps[1] + ' tekrara ulaştın. Gelecek sefer ' + (e.bw ? 'ek ağırlık tak.' : 'ağırlığı ' + (leg ? '5' : '2,5') + ' kg artır.');
@@ -1755,7 +1797,12 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     });
   }
 
+  function histSeg() {
+    return '<div class="seg" role="group" aria-label="Geçmiş görünümü">' +
+      [['seans', 'Seanslar'], ['ilerleme', 'İlerleme']].map(function (o) { return '<button type="button" data-act="hview" data-v="' + o[0] + '" aria-pressed="' + (histView === o[0]) + '">' + o[1] + '</button>'; }).join('') + '</div>';
+  }
   function renderHistory() {
+    if (histView === 'ilerleme') { view.innerHTML = histSeg() + progressHTML(); return; }
     var docs = histDocs();
 
     var lifts = docs.filter(function (d) { return PROGRAM[idxOfSid(d.s)].type !== 'rest'; });
@@ -1768,7 +1815,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
       while (lifts.some(function (d) { return d.date >= ws && d.date <= addDays(ws, 6); })) { weeks++; ws = addDays(ws, -7); }
     }
 
-    var h = '';
+    var h = histSeg();
     h += '<section class="sum-grid"><div><b>' + last30.length + '</b><span>antrenman · 30 gün</span></div>' +
       '<div><b>' + (vol30 >= 10000 ? fmt1(vol30 / 1000) + ' t' : Math.round(vol30).toLocaleString('tr-TR')) + '</b><span>' + (vol30 >= 10000 ? 'hacim · 30 gün' : 'kg hacim · 30 gün') + '</span></div>' +
       '<div><b>' + weeks + '</b><span>hafta üst üste</span></div></section>';
@@ -1806,36 +1853,6 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
       '<p class="legend"><i style="--c:var(--push)"></i>İtiş<i style="--c:var(--pull)"></i>Çekiş<i style="--c:var(--leg)"></i>Bacak<i style="--c:var(--rest)"></i>Karın</p>' +
       '<p class="muted">Yardımcı çalışan kas yarım set sayılır (ör. row’da biceps). Kas gelişimi için haftada kas başına kabaca 10–20 set hedeflenir; tükenişe yakın çalıştığın için alt sınıra yakın olman normal.</p></section>';
 
-    /* progress per exercise */
-    var ex = ALL_EX.filter(function (x) { return x.key === progKey; })[0] || ALL_EX[0];
-    var pts = [], best = 0, bestDate = null;
-    liveDocs().slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; }).forEach(function (d) {
-      if (!d.sets[ex.id]) { return; }
-      var v = 0;
-      d.sets[ex.id].forEach(function (s) {
-        if (!s.d) { return; }
-        var w = s.w[ex.p], r = s.r[ex.p];
-        if (ex.bw) { if (r) { v = Math.max(v, r); } }
-        else if (w && r) { v = Math.max(v, e1rm(w, r)); }
-      });
-      if (!v) { return; }
-      if (pts.length && pts[pts.length - 1].x === d.date) { pts[pts.length - 1].y = Math.max(pts[pts.length - 1].y, v); }
-      else { pts.push({ x: d.date, y: Math.round(v * 10) / 10 }); }
-      if (v > best) { best = v; bestDate = d.date; }
-    });
-    h += '<section class="card"><label class="lbl" for="prog-sel">Hareket gelişimi</label><select class="sel" id="prog-sel">' +
-      ['push', 'pull', 'leg'].map(function (t) {
-        return '<optgroup label="' + { push: 'İtiş', pull: 'Çekiş', leg: 'Bacak' }[t] + '">' + ALL_EX.filter(function (x) { return x.type === t; }).map(function (x) {
-          return '<option value="' + x.key + '"' + (x.key === ex.key ? ' selected' : '') + '>' + esc(x.name) + '</option>';
-        }).join('') + '</optgroup>';
-      }).join('') + '</select>';
-    if (pts.length) {
-      h += '<p class="muted">' + (ex.bw ? 'Seanstaki en iyi tekrar sayısı.' : 'Seanstaki en güçlü setten hesaplanan tahmini 1 tekrar maksimum (kg).') + ' En iyi: <b>' + fmt1(best) + (ex.bw ? ' tekrar' : ' kg') + '</b> · ' + shortDate(bestDate) + '</p>' + lineChart(pts.slice(-40), ex.bw ? 'tekrar' : 'kg', ex.type);
-    } else {
-      h += '<p class="empty">Bu hareketi kaydettikçe gelişimin burada çizilir.</p>';
-    }
-    h += '</section>';
-
     /* session list */
     h += '<p class="sec-h"><span>Seanslar</span><b>' + docs.length + '</b></p>';
     if (!docs.length) { h += '<p class="empty">Henüz kayıtlı antrenman yok. Antrenman sekmesinde ilk setini işaretle.</p>'; }
@@ -1857,6 +1874,140 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
       '<label class="btn ghost sm" style="display:grid;place-items:center" for="import-file">Yedekten yükle</label></div>' +
       '<input class="filein" id="import-file" type="file" accept=".json,application/json"><div id="dump"></div></section>';
     view.innerHTML = h;
+  }
+
+  /* ================= geçmiş: ilerleme ================= */
+  function exOfDoc(doc, id) {
+    var i = idxOfSid(doc.s);
+    if (i < 0) { return null; }
+    for (var k = 0; k < PROGRAM[i].ex.length; k++) { if (PROGRAM[i].ex[k].id === id) { return PROGRAM[i].ex[k]; } }
+    return null;
+  }
+  /* one entry per session that has a finished set of this exercise part; read-only */
+  function progSessions(x) {
+    var out = [];
+    liveDocs().filter(function (d) { return d.sets && d.sets[x.id]; })
+      .sort(function (a, b) { return a.date < b.date ? -1 : (a.date > b.date ? 1 : a.u - b.u); })
+      .forEach(function (d) {
+        var done = d.sets[x.id].filter(function (s) { return s.d && s.r[x.p] > 0 && (x.bw || s.w[x.p] > 0); });
+        if (!done.length) { return; }
+        var top = null, e1 = 0;
+        done.forEach(function (s) {
+          var w = s.w[x.p] || 0, r = s.r[x.p];
+          if (!top || (x.bw ? (r > top.r || (r === top.r && w > top.w)) : (w > top.w || (w === top.w && r > top.r)))) { top = { w: w, r: r }; }
+          if (!x.bw) { e1 = Math.max(e1, e1rm(w, r)); }
+        });
+        out.push({ doc: d, date: d.date, done: done, top: top, e1: e1 });
+      });
+    return out;
+  }
+  function progStatus(x, sess) {
+    if (sess.length) {
+      var last = sess[sess.length - 1], le = exOfDoc(last.doc, x.id);
+      if (le && hitTop(le, setsOf(last.doc, le))) { return { k: 'up', t: 'Kilo artır' }; }
+    }
+    if (sess.length < 3) { return { k: 'few', t: 'Veri az' }; }
+    if (x.bw) { return null; }
+    return isStalled(x.ex, null) ? { k: 'stall', t: 'Takıldı' } : { k: 'ok', t: 'İlerliyor' };
+  }
+  function statusChip(st) {
+    if (!st) { return ''; }
+    return '<span class="pchip ' + st.k + '"><i aria-hidden="true"></i>' + st.t + '</span>';
+  }
+  function topText(x, t) { return x.bw ? (t.w ? '+' + fmt(t.w) + ' kg × ' : '') + fmt(t.r) + ' tekrar' : fmt(t.w) + ' kg × ' + fmt(t.r); }
+  function weekTotals(from, to) {
+    var t = { n: 0, sets: 0, vol: 0 };
+    histDocs().forEach(function (d) {
+      var i = idxOfSid(d.s);
+      if (PROGRAM[i].type === 'rest' || d.date < from || d.date > to) { return; }
+      var st = docStats(d, PROGRAM[i]);
+      t.n++; t.sets += st.sets; t.vol += st.vol;
+    });
+    return t;
+  }
+  function deltaText(a, b, unit) {
+    var d = Math.round(a - b);
+    if (!d) { return 'geçen haftayla aynı'; }
+    return (d > 0 ? '+' : '−') + Math.abs(d).toLocaleString('tr-TR') + (unit || '') + ' geçen haftaya göre';
+  }
+  function progressHTML() {
+    var lifts = histDocs().filter(function (d) { return PROGRAM[idxOfSid(d.s)].type !== 'rest'; });
+    if (!lifts.length) {
+      return '<p class="empty">Henüz kayıtlı antrenman yok. Set işaretledikçe her hareketin kilo ve tekrar gelişimi burada çizilir.</p>';
+    }
+    var h = '';
+    /* this week so far against last week up to the same weekday */
+    var dn = dayDiff(today, weekStart);
+    var cur = weekTotals(weekStart, today), prev = weekTotals(addDays(weekStart, -7), addDays(today, -7));
+    var dayLbl = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+    h += '<section class="card"><span class="lbl">Bu hafta (' + (dn ? 'Pzt–' + dayLbl[dn] : 'Pzt') + ') · geçen haftanın aynı günlerine göre</span><div class="sum-grid">' +
+      '<div><b>' + cur.n + '</b><span>antrenman<br>' + deltaText(cur.n, prev.n) + '</span></div>' +
+      '<div><b>' + cur.sets + '</b><span>set<br>' + deltaText(cur.sets, prev.sets) + '</span></div>' +
+      '<div><b>' + Math.round(cur.vol).toLocaleString('tr-TR') + '</b><span>kg hacim<br>' + deltaText(cur.vol, prev.vol, ' kg') + '</span></div></div></section>';
+
+    /* selected exercise */
+    var x = ALL_EX.filter(function (q) { return q.key === progKey; })[0] || ALL_EX[0];
+    var sess = progSessions(x), st = progStatus(x, sess);
+    h += '<section class="card prog" id="prog-card"><label class="lbl" for="prog-sel">Hareket</label><select class="sel" id="prog-sel">' +
+      ['push', 'pull', 'leg'].map(function (t) {
+        return '<optgroup label="' + { push: 'İtiş', pull: 'Çekiş', leg: 'Bacak' }[t] + '">' + ALL_EX.filter(function (q) { return q.type === t; }).map(function (q) {
+          return '<option value="' + q.key + '"' + (q.key === x.key ? ' selected' : '') + '>' + esc(q.name) + '</option>';
+        }).join('') + '</optgroup>';
+      }).join('') + '</select>';
+    h += '<div class="prog-h">' + statusChip(st) + '<div class="seg sm" role="group" aria-label="Aralık">' +
+      [['12', '12 hafta'], ['all', 'Tümü']].map(function (o) { return '<button type="button" data-act="prange" data-v="' + o[0] + '" aria-pressed="' + (progRange === o[0]) + '">' + o[1] + '</button>'; }).join('') + '</div></div>';
+    if (sess.length < 3) {
+      h += '<p class="empty">' + (sess.length ? 'Bu hareketten ' + sess.length + ' seans var. Grafik 3. seanstan sonra çıkar.' : 'Bu hareketi henüz kaydetmedin. İlk setini işaretleyince burada görünür.') + '</p>';
+    } else {
+      var from = progRange === '12' ? addDays(today, -83) : '0000-00-00';
+      var pts = [];
+      sess.filter(function (q) { return q.date >= from; }).forEach(function (q) {
+        var y = x.bw ? q.top.r : q.top.w, lab = x.bw ? (q.top.w ? '+' + fmt(q.top.w) : '') : fmt(q.top.r);
+        var lastPt = pts[pts.length - 1];
+        if (lastPt && lastPt.x === q.date) { if (y >= lastPt.y) { lastPt.y = y; lastPt.lab = lab; } return; }
+        pts.push({ x: q.date, y: y, lab: lab });
+      });
+      if (pts.length < 2) {
+        h += '<p class="empty">Son 12 haftada bu hareketten az kayıt var. Tümü’ne dokun.</p>';
+      } else {
+        h += '<p class="muted">' + (x.bw ? 'Her seansın en iyi tekrarı. Noktadaki sayı taktığın ek kilo.' : 'Her seansın en ağır seti (kg). Noktadaki sayı o setin tekrarı.') + '</p>' + lineChart(pts, x.bw ? 'tekrar' : 'kg', x.type);
+      }
+    }
+    if (sess.length) {
+      var rec1, rec2;
+      if (x.bw) {
+        var mr = sess[0], mw = null;
+        sess.forEach(function (q) { if (q.top.r > mr.top.r) { mr = q; } q.done.forEach(function (s) { var w = s.w[x.p] || 0; if (w && (!mw || w > mw.w)) { mw = { w: w, r: s.r[x.p], date: q.date }; } }); });
+        rec1 = '<div><b>' + fmt(mr.top.r) + '</b><span>en çok tekrar · ' + shortDate(mr.date) + '</span></div>';
+        rec2 = '<div><b>' + (mw ? '+' + fmt(mw.w) : '–') + '</b><span>' + (mw ? 'en ağır ek kilo (× ' + fmt(mw.r) + ') · ' + shortDate(mw.date) : 'ek kilo yok') + '</span></div>';
+      } else {
+        var hv = sess[0];
+        sess.forEach(function (q) { if (q.top.w > hv.top.w || (q.top.w === hv.top.w && q.top.r > hv.top.r)) { hv = q; } });
+        var b1 = bestSet(x.id, x.p, null);
+        rec1 = '<div><b>' + fmt(hv.top.w) + '</b><span>en ağır set (kg × ' + fmt(hv.top.r) + ') · ' + shortDate(hv.date) + '</span></div>';
+        rec2 = '<div><b>' + fmt1(b1.v) + '</b><span>en iyi tahmini 1RM (kg) · ' + fmt(b1.w) + ' × ' + fmt(b1.r) + ' · ' + shortDate(b1.date) + '</span></div>';
+      }
+      h += '<span class="lbl">Rekorlar</span><div class="sum-grid two">' + rec1 + rec2 + '</div>';
+      if (!x.bw) { h += '<p class="muted">Son seansın tahmini 1RM’i: <b>' + fmt1(sess[sess.length - 1].e1) + ' kg</b></p>'; }
+      var fake = { parts: [x.name], bw: x.bw };
+      h += '<span class="lbl">Son seanslar</span><ol class="plist">' + sess.slice(-5).reverse().map(function (q) {
+        return '<li><span>' + shortDate(q.date) + '</span>' + setsLine(fake, q.done.map(function (s) { return { w: [s.w[x.p]], r: [s.r[x.p]] }; })) + '</li>';
+      }).join('') + '</ol>';
+    }
+    h += '</section>';
+
+    /* every program exercise with its status */
+    h += '<section class="card"><span class="lbl">Hareketler · birine dokun</span>';
+    ['push', 'pull', 'leg'].forEach(function (t) {
+      h += '<p class="sec-h"><span>' + { push: 'İtiş', pull: 'Çekiş', leg: 'Bacak' }[t] + '</span></p>';
+      ALL_EX.filter(function (q) { return q.type === t; }).forEach(function (q) {
+        var ss = progSessions(q), last = ss[ss.length - 1];
+        h += '<button type="button" class="pxrow" data-act="prog-pick" data-k="' + q.key + '" aria-pressed="' + (q.key === x.key) + '"><span class="pxn"><b>' + esc(q.name) + '</b><span>' +
+          (last ? topText(q, last.top) + ' · ' + shortDate(last.date) : 'Kayıt yok') + '</span></span>' + (ss.length ? statusChip(progStatus(q, ss)) : '') + '</button>';
+      });
+    });
+    h += '<p class="muted">Kilo artır: son seansta tüm setler üst tekrara ulaştı. Takıldı: 3 seanstır tahmini 1RM artmadı. Antrenman ekranındaki kurallarla aynı.</p></section>';
+    return h;
   }
 
   /* ================= render dispatcher ================= */
@@ -2011,6 +2162,13 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     else if (act === 'goto-in') {
       var gi = document.getElementById(b.getAttribute('data-id'));
       if (gi) { gi.scrollIntoView({ block: 'center' }); gi.focus(); }
+    }
+    else if (act === 'hview') { histView = b.getAttribute('data-v'); render(); window.scrollTo(0, 0); }
+    else if (act === 'prange') { progRange = b.getAttribute('data-v'); render(); }
+    else if (act === 'prog-pick') {
+      progKey = b.getAttribute('data-k'); render();
+      var pc = document.getElementById('prog-card');
+      if (pc) { pc.scrollIntoView({ block: 'start' }); }
     }
     else if (act === 'brief') { briefOpen = !briefOpen; renderWeek(); }
     else if (act === 'edit-exit') { editKey = null; sel = startSel(); renderDay(); renderWeek(); window.scrollTo(0, 0); }

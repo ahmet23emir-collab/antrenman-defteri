@@ -126,3 +126,13 @@ Yeni görevler buraya eklenir, biten görev işaretlenir.
     6. Nötrler sıcak: açık temada kırık beyaz/kum, koyu temada sıcak kömür; ✓ yeşili biraz solar ama net kalır.
     7. İki temada tüm renk çiftleri ölçülür: metin ≥ 4,5:1, grafik ≥ 3:1 (bacak dahil); tür renkleri ayırt edilebilir kalır.
   - Kapsam dışı: üçlü istatistik kutuları, takvim ekranı, yeni özellik, font değişikliği, erişilebilirlik.
+- [x] GÖREV 6: İlerleme ekranı. Geri dönüş noktası: `ilerleme-oncesi` etiketi. Veri modeli ve kayıtlar değişmez (sadece okunur), yeni bağımlılık yok (SVG elle), 400 px, iki tema, antrenman ekranı düzeni aynen kalır.
+  - Yer: Geçmiş sekmesinin üstünde "Seanslar | İlerleme" seçici; mevcut "Hareket gelişimi" İlerleme tarafına taşınır. Alt sekme sayısı 5 kalır.
+  - Grafik: seansın en ağır seti (kg) çizgisi, her noktada o setin tekrarı; altında son seansların listesi. Tahmini 1RM ayrı sayı, çizilmez.
+  - Rekorlar: "En ağır set" (kg × tekrar) ve "En iyi tahmini 1RM", tarihleriyle.
+  - Hafta karşılaştırması: bu hafta şu ana kadar ↔ geçen hafta aynı güne kadar; antrenman, set, hacim ve farkları.
+  - Hareket durumu: Kilo artır (son seansta tüm setler üst tekrarda), İlerliyor, Takıldı (mevcut takılma kuralı), Veri az (3'ten az seans).
+  - Sadece şu anki programdaki hareketler. Vücut ağırlığı hareketlerinde grafik en iyi tekrar; rekorlar en çok tekrar ve en ağır ek kilo.
+  - Aralık: son 12 hafta varsayılan, "Tümü" düğmesi.
+  - Rekor, tahmini 1RM, çift ilerleme ve takılma hesapları antrenman ekranıyla aynı fonksiyonları kullanır; iki ekranda farklı sayı çıkması hatadır.
+  - Veri azsa (3'ten az seans) grafik yerine kısa açıklama; hiç kayıt yoksa boş durum.
