@@ -136,3 +136,9 @@ Yeni görevler buraya eklenir, biten görev işaretlenir.
   - Aralık: son 12 hafta varsayılan, "Tümü" düğmesi.
   - Rekor, tahmini 1RM, çift ilerleme ve takılma hesapları antrenman ekranıyla aynı fonksiyonları kullanır; iki ekranda farklı sayı çıkması hatadır.
   - Veri azsa (3'ten az seans) grafik yerine kısa açıklama; hiç kayıt yoksa boş durum.
+- [x] GÖREV 7: İlerleme ekranı düzeltmeleri.
+  1. Tekrar grafiğinin dikey ekseni tam sayı (ondalık yok); kilo ekseni ondalık kalabilir.
+  2. Grafik nokta etiketleri çizgiyle çakışmaz (etiketin arkasında zemin rengi).
+  3. Durum tutarlılığı: bugün devam eden, bitmemiş seans iki ekranda da takılma/ilerliyor/kilo artır hesabına girmez; iki ekran aynı seans kümesini kullanır. Rekor ve grafik bitmemiş seansı göstermeye devam edebilir.
+  4. "12 hafta" süzmesi 14+ haftalık örnek veriyle test edilir.
+  - Bitirince: `sw.js` VERSION 'v7'; 400 px açık ve koyu tema testi; commit + push.
