@@ -98,3 +98,13 @@ Yeni görevler buraya eklenir, biten görev işaretlenir.
   - Yedek indirme:
     9. "Yedeği indir": `navigator.canShare({files})` destekleniyorsa paylaşım menüsü açılır, yoksa Blob + `<a download>`. İçerik formatı aynı: `{ app: 'antrenman-defteri', v: 2, exported, workouts, daily, profile }`.
   - Bitirince: `sw.js` VERSION artır; boş test tarayıcısında 400 px'te 1, 2, 3, 4, 5, 7'yi dene; commit + push.
+- [x] GÖREV 3: Salon ergonomisi (UX denetimi, yüksek öncelik). Veri modeli, program ve koçluk kuralları aynen geçerli. Koç uyarıları (48 saat, takılma, deload) kaldırılmaz, sadece yerleri değişebilir.
+  1. Antrenman sekmesi açılınca sıradaki yapılmamış sete kendiliğinden kaydırılır. Haftalık ızgara ve koç önerisi tek satırlık özete iner ("Bu hafta 3/6 · Öneri: Çekiş 1"), dokununca açılır. Başlık kartı küçülür; kilo/tekrar alanları, hedef ve ✓ en baskın öğe olur. Aktif uyarı (48 saat gibi) özet satırında görünür kalır.
+  2. Boş tekrarla ✓ basınca geçen seansın tekrarını yazma davranışı kalır ama görünür olur: (a) geçen seferin değeri placeholder, kontrast en az 4,5:1; (b) yanında bugünün hedefi ("geçen sefer 5 · hedef 6–8"); (c) otomatik doldurulan değer farklı stille işaretlenir ve altta "Geçen seferki 5 tekrar yazıldı · Geri al" bildirimi çıkar.
+  3. Antrenman sırasında basılan tüm düğmelerin dokunma alanı en az 44 × 44 px (.mini, .rb, .pill, "−", "Form, alternatif ve notum"); görsel boyut değil, padding/dokunma alanı büyür.
+  4. Bildirim altta, dinlenme çubuğunun hemen üstünde, safe-area'ya uygun çıkar. "Yeni rekor" ve kilo önerisi en az 6 sn kalır, dokununca kapanır.
+  5. Tüm düğme ve ✓ dairesine `touch-action: manipulation`.
+  6. Dinlenme çubuğu sıradaki set satırını örtmez: sayfaya çubuk yüksekliği kadar alt boşluk, sıradaki set çubuğun üstünde görünür bırakılır.
+  7. Kilo önerisinde alt ve üst sayı eşitse "6 tekrar hedefle" yazılır ("6–6" hatası).
+  - Kapsam dışı: yazı boyutu cilası, sarı çubuk kontrastı, boş ekran düğmeleri, erişilebilirlik (aria, inert, h1).
+  - Bitirince: `sw.js` VERSION 'v3'; boş test tarayıcısında 400 px, açık ve koyu temada dene; commit + push.

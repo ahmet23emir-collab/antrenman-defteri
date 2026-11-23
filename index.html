@@ -86,7 +86,7 @@ body {
   font-size: 16px;
   line-height: 1.4;
   -webkit-text-size-adjust: 100%;
-  padding-block: 10px calc(11rem + env(safe-area-inset-bottom, 0px));
+  padding-block: 10px calc(9rem + var(--rest-h, 0px) + env(safe-area-inset-bottom, 0px));
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
@@ -124,7 +124,7 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 /* today strip on the training tab */
 .strip { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .strip .sl { font-size: .72rem; font-weight: 700; letter-spacing: .06em; color: var(--ink-2); width: 100%; }
-.pill { appearance: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--line); background: var(--surface-2); border-radius: 99px; padding: 6px 12px 6px 8px; font-size: .85rem; font-weight: 600; min-height: 2.25rem; }
+.pill { appearance: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--line); background: var(--surface-2); border-radius: 99px; padding: 6px 12px 6px 8px; font-size: .85rem; font-weight: 600; min-height: 2.75rem; }
 .pill .bx { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; color: transparent; }
 .pill .bx svg { width: 12px; height: 12px; }
 .pill[aria-pressed="true"] { background: var(--done-soft); border-color: var(--done); }
@@ -133,16 +133,17 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 .pill.water b { font-variant-numeric: tabular-nums; }
 
 /* hero */
-.hero { position: relative; overflow: hidden; border-radius: 18px; padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 10px; background: var(--day); color: var(--on-day); }
+.hero { position: relative; overflow: hidden; border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; background: var(--day); color: var(--on-day); }
 .hero[data-type="push"] { --day: var(--push); --on-day: var(--on-push); }
 .hero[data-type="pull"] { --day: var(--pull); --on-day: var(--on-pull); }
 .hero[data-type="leg"]  { --day: var(--leg);  --on-day: var(--on-leg); }
 .hero[data-type="rest"] { --day: var(--rest); --on-day: var(--on-rest); }
 .hero > * { position: relative; }
-.hero .plate { position: absolute; right: -28px; top: -28px; width: 160px; height: 160px; opacity: .2; color: var(--on-day); }
-.eyebrow { margin: 0; font-size: .8rem; font-weight: 700; letter-spacing: .08em; }
-.hero h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(3rem, 17vw, 4.6rem); line-height: .88; letter-spacing: .01em; text-wrap: balance; }
-.meta { margin: 0; font-size: .95rem; font-weight: 600; }
+.hero .plate { position: absolute; right: -18px; top: -18px; width: 84px; height: 84px; opacity: .2; color: var(--on-day); }
+.eyebrow { margin: 0; font-size: .75rem; font-weight: 700; letter-spacing: .08em; }
+.hero h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; line-height: 1; letter-spacing: .01em; text-wrap: balance; }
+.meta { margin: 0; font-size: .85rem; font-weight: 600; }
+.hero-r { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .prog { display: flex; align-items: center; gap: 10px; font-size: .85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .track { position: relative; flex: 1; height: 8px; border-radius: 99px; overflow: hidden; }
 .track::before { content: ""; position: absolute; inset: 0; background: var(--on-day); opacity: .28; }
@@ -169,8 +170,10 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 .last b, .warm b { color: var(--ink); font-weight: 600; }
 
 .sets { display: flex; flex-direction: column; gap: 6px; }
-.set { position: relative; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) 2.9rem; gap: 8px; align-items: center; padding: 6px 6px 6px 8px; border-radius: 12px; background: var(--surface-2); transition: background .15s; }
+.set { position: relative; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) 3.2rem; gap: 8px; align-items: center; padding: 6px 6px 6px 8px; border-radius: 12px; background: var(--surface-2); transition: background .15s; }
 .set.done { background: var(--done-soft); }
+.set .fld input { height: 3.2rem; font-size: 1.45rem; }
+.set .fld input::placeholder { font-size: 1.05rem; font-weight: 400; }
 .sn { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: var(--ink-2); text-align: center; }
 .pr { position: absolute; left: 4px; top: -7px; font-size: .62rem; font-weight: 800; letter-spacing: .06em; background: var(--leg); color: var(--on-leg); border-radius: 99px; padding: 1px 6px; }
 .parts { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -183,14 +186,15 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
   -webkit-appearance: none; appearance: none;
 }
 .fld span { position: absolute; right: .65rem; top: 50%; transform: translateY(-50%); font-size: .7rem; color: var(--ink-2); pointer-events: none; }
-.fld input::placeholder { color: var(--ink-2); opacity: .55; font-weight: 500; }
+.fld input::placeholder { color: var(--ink-2); opacity: 1; font-weight: 500; }
+.fld input.auto { font-style: italic; color: var(--ink-2); text-decoration: underline dotted; text-underline-offset: 4px; }
 .fld input:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
-.chk { appearance: none; width: 2.9rem; height: 2.9rem; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); color: var(--line); display: grid; place-items: center; cursor: pointer; padding: 0; flex: none; }
+.chk { appearance: none; width: 3.2rem; height: 3.2rem; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); color: var(--line); display: grid; place-items: center; cursor: pointer; padding: 0; flex: none; }
 .chk svg { width: 1.4rem; height: 1.4rem; }
 .set.done .chk, .chk[aria-pressed="true"] { background: var(--done); border-color: var(--done); color: var(--on-done); }
 .hint { margin: 0; font-size: .85rem; font-weight: 600; background: var(--done-soft); border-radius: 10px; padding: 8px 10px; }
 .setbar { display: flex; gap: 6px; justify-content: flex-end; }
-.mini { appearance: none; cursor: pointer; border: 1px solid var(--line); background: transparent; border-radius: 8px; min-height: 2rem; padding: 0 10px; font-size: .8rem; font-weight: 600; color: var(--ink-2); }
+.mini { appearance: none; cursor: pointer; border: 1px solid var(--line); background: transparent; border-radius: 8px; min-height: 2.75rem; min-width: 2.75rem; padding: 0 12px; font-size: .8rem; font-weight: 600; color: var(--ink-2); }
 
 /* buttons, cards */
 .btn { appearance: none; border: 0; border-radius: 14px; min-height: 3.25rem; padding: 0 18px; width: 100%; font-weight: 700; font-size: 1rem; background: var(--ink); color: var(--bg); cursor: pointer; }
@@ -218,8 +222,8 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 .bar2 { height: 10px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
 .bar2 i { display: block; height: 100%; width: 0; border-radius: 99px; background: var(--c, var(--pull)); transition: width .25s; }
 .btns { display: flex; flex-wrap: wrap; gap: 6px; }
-.btns button { appearance: none; cursor: pointer; flex: 1 1 4rem; min-height: 2.6rem; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface-2); font-weight: 700; font-size: .9rem; font-variant-numeric: tabular-nums; }
-.btns button.minus { flex: 0 0 auto; padding: 0 12px; color: var(--ink-2); background: transparent; }
+.btns button { appearance: none; cursor: pointer; flex: 1 1 4rem; min-height: 2.75rem; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface-2); font-weight: 700; font-size: .9rem; font-variant-numeric: tabular-nums; }
+.btns button.minus { flex: 0 0 auto; min-width: 2.75rem; padding: 0 12px; color: var(--ink-2); background: transparent; }
 .trk .note { margin: 0; font-size: .8rem; color: var(--ink-2); }
 
 /* supplements */
@@ -282,10 +286,10 @@ details.notes[open] summary::after { content: "–"; }
 .rest-t { display: grid; gap: 0; flex: 1; min-width: 0; }
 .rest-l { font-size: .75rem; font-weight: 700; letter-spacing: .06em; opacity: .8; }
 .rest-time { font-family: var(--font-display); font-weight: 800; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
-.rb { appearance: none; border: 1.5px solid currentColor; background: transparent; color: inherit; border-radius: 10px; min-height: 2.6rem; padding: 0 12px; font-weight: 700; font-size: .9rem; cursor: pointer; }
+.rb { appearance: none; border: 1.5px solid currentColor; background: transparent; color: inherit; border-radius: 10px; min-height: 2.75rem; min-width: 2.75rem; padding: 0 12px; font-weight: 700; font-size: .9rem; cursor: pointer; }
 
 /* toast */
-.toast { position: fixed; left: 50%; transform: translateX(-50%); top: calc(12px + env(safe-area-inset-top, 0px)); z-index: 40; background: var(--bar); color: var(--on-bar); border-radius: 12px; padding: 10px 14px; font-size: .9rem; font-weight: 600; max-width: calc(100% - 32px); box-shadow: 0 12px 30px -8px rgba(0,0,0,.45); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(4rem + var(--rest-h, 0px) + 10px + env(safe-area-inset-bottom, 0px)); z-index: 40; display: flex; align-items: center; gap: 12px; width: max-content; cursor: pointer; background: var(--bar); color: var(--on-bar); border-radius: 12px; padding: 10px 14px; font-size: .9rem; font-weight: 600; max-width: calc(100% - 32px); box-shadow: 0 12px 30px -8px rgba(0,0,0,.45); }
 
 /* bottom tab bar */
 .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--surface); border-top: 1px solid var(--line);
@@ -304,18 +308,18 @@ textarea.dump { width: 100%; min-height: 8rem; font: .75rem/1.4 ui-monospace, Me
 
 /* day navigation on the daily tabs */
 .dnav { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; }
-.dnav .mini { min-width: 2.6rem; min-height: 2.6rem; font-size: 1.2rem; color: var(--ink); }
+.dnav .mini { min-width: 2.75rem; min-height: 2.75rem; font-size: 1.2rem; color: var(--ink); }
 .dnav .mini:disabled { opacity: .3; cursor: default; }
 .dn-m { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: .85rem; color: var(--ink-2); min-width: 0; }
 .dn-m b { color: var(--ink); }
 .dn-m em { font-style: normal; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 /* today's target and stall note inside an exercise card */
-.goal { margin: 0; font-size: .84rem; font-variant-numeric: tabular-nums; border-left: 3px solid var(--ink); padding: 2px 0 2px 8px; }
+.goal { margin: 0; font-size: .92rem; font-variant-numeric: tabular-nums; border-left: 3px solid var(--ink); padding: 2px 0 2px 8px; }
 .goal.stall { border-color: var(--warn); color: var(--ink-2); }
 .goal.stall b { color: var(--warn); }
 details.how { border-top: 1px solid var(--line); margin-top: 2px; }
-details.how summary { list-style: none; cursor: pointer; padding: 8px 0 2px; font-size: .8rem; font-weight: 700; color: var(--ink-2); display: flex; justify-content: space-between; }
+details.how summary { list-style: none; cursor: pointer; padding: 0; min-height: 2.75rem; align-items: center; font-size: .8rem; font-weight: 700; color: var(--ink-2); display: flex; justify-content: space-between; }
 details.how summary::-webkit-details-marker { display: none; }
 details.how summary::after { content: "+"; }
 details.how[open] summary::after { content: "–"; }
@@ -395,6 +399,19 @@ button.cd { appearance: none; border: 0; font: inherit; color: inherit; cursor: 
 button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .editbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--warn-soft); border: 1px solid var(--warn); border-radius: 12px; padding: 10px 12px; font-size: .88rem; font-weight: 600; }
 .editbar .mini { color: var(--ink); border-color: var(--ink-2); flex: none; }
+
+/* GÖREV 3: gym ergonomics */
+button, summary, label, a, input, select, textarea, .chk { touch-action: manipulation; }
+.toast-a { appearance: none; border: 1.5px solid currentColor; background: transparent; color: inherit; border-radius: 10px; min-height: 2.75rem; min-width: 2.75rem; padding: 0 12px; font: inherit; font-weight: 700; cursor: pointer; flex: none; }
+.cap { margin: -2px 0 0; padding: 0 4px; font-size: .85rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.cap b { color: var(--ink); font-weight: 700; }
+.brief-w { display: grid; gap: 10px; }
+.brief { appearance: none; cursor: pointer; width: 100%; min-height: 2.75rem; text-align: left; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.brief-t { flex: 1 1 auto; font-size: .9rem; font-variant-numeric: tabular-nums; min-width: 0; }
+.brief-t b { font-weight: 700; }
+.brief-c { margin-left: auto; color: var(--ink-2); font-size: 1rem; line-height: 1; transition: transform .15s; }
+.brief[aria-expanded="true"] .brief-c { transform: rotate(180deg); }
+.chipw { font-size: .78rem; font-weight: 700; color: var(--warn); background: var(--warn-soft); border: 1px solid var(--warn); border-radius: 99px; padding: 2px 8px; white-space: nowrap; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -922,7 +939,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
         nw = round25(est / (1 + upT / 30));
         var minUp = leg ? 5 : 2.5;
         if (nw < w + minUp) { nw = w + minUp; }
-        out = { kind: 'up', p: p, w: nw, msg: who + '<b>' + r + ' tekrar yaptın, hedef ' + lo + '–' + hi + '. Bu kilo hafif.</b> Sonraki sette ' + fmt(nw) + ' kg ile ' + upT + '–' + hi + ' tekrar hedefle.' };
+        out = { kind: 'up', p: p, w: nw, msg: who + '<b>' + r + ' tekrar yaptın, hedef ' + lo + '–' + hi + '. Bu kilo hafif.</b> Sonraki sette ' + fmt(nw) + ' kg ile ' + (upT === hi ? hi : upT + '–' + hi) + ' tekrar hedefle.' };
       } else {
         nw = round25(est / (1 + downT / 30));
         if (nw >= w) { nw = w - 2.5; }
@@ -1032,6 +1049,9 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
   var needsRender = false;
   var vd = today; /* the day shown on the Beslenme and Takviye tabs */
   var editKey = null; /* a past session opened from Geçmiş for editing */
+  var briefOpen = false; /* the week grid and coach notes above the session */
+  var autoMark = {}; /* inputs filled from the last session by a quick ✓, shown in italics until edited */
+  function autoKey(doc, exId, j, p, k) { return keyOf(doc.date, doc.s) + '|' + exId + '|' + j + '|' + p + '|' + k; }
   function dayNav(right) {
     var lab = vd === today ? 'Bugün' : (vd === addDays(today, -1) ? 'Dün' : shortDate(vd));
     return '<div class="dnav"><button type="button" class="mini" data-act="day" data-d="-1" aria-label="Önceki gün">‹</button>' +
@@ -1041,14 +1061,24 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
 
   function editing() { var a = document.activeElement; return !!(a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT')); }
 
-  var toastEl = document.getElementById('toast'), toastT = null;
-  function toast(msg, bad) {
-    toastEl.textContent = msg;
-    toastEl.classList.toggle('bad', !!bad);
+  /* toast sits at the bottom, above the rest bar; tap closes it. opt: true (error) or { bad, ms, action: { label, fn } } */
+  var toastEl = document.getElementById('toast'), toastT = null, toastFn = null;
+  function toast(msg, opt) {
+    if (opt === true) { opt = { bad: true }; }
+    opt = opt || {};
+    toastEl.innerHTML = '<span>' + esc(msg) + '</span>' + (opt.action ? '<button type="button" class="toast-a">' + esc(opt.action.label) + '</button>' : '');
+    toastFn = opt.action ? opt.action.fn : null;
+    toastEl.classList.toggle('bad', !!opt.bad);
     toastEl.hidden = false;
     clearTimeout(toastT);
-    toastT = setTimeout(function () { toastEl.hidden = true; }, 3500);
+    toastT = setTimeout(hideToast, opt.ms || 3500);
   }
+  function hideToast() { clearTimeout(toastT); toastEl.hidden = true; toastFn = null; }
+  toastEl.addEventListener('click', function (ev) {
+    var fn = ev.target.closest('.toast-a') ? toastFn : null;
+    hideToast();
+    if (fn) { fn(); }
+  });
 
   /* ================= number fields ================= */
   /* a complete number: 42, 42,5, 42.5, ",5"; a trailing separator ("42,") is fine while typing */
@@ -1155,6 +1185,21 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
   }
 
   /* ================= tab: antrenman ================= */
+  function titleCase(t) { var l = trLower(t); return l.charAt(0).toLocaleUpperCase('tr') + l.slice(1); }
+  /* coach notes for the selected session; they live in the collapsible summary above it */
+  function dayNotes(day, doc) {
+    var out = { warn: spacingNote(day, doc), sleep: 0, deload: 0, html: '' };
+    if (day.type === 'rest') { return out; }
+    var slp = daily[today] && daily[today].sleep;
+    if (doc.date === today && slp && slp < 6) { out.sleep = slp; }
+    var tw = trainWeeks();
+    if (tw >= 7 && doneCount(doc, day) === 0 && !(profile.deloadAt && dayDiff(today, profile.deloadAt) < 42)) { out.deload = tw; }
+    if (out.warn) { out.html += '<aside class="tip warn"><b>KOÇ UYARISI</b><p>' + out.warn + '</p></aside>'; }
+    if (out.sleep) { out.html += '<aside class="tip warn"><b>AZ UYKU · ' + fmt(out.sleep) + ' SAAT</b><p>Bugün rekor günü değil. Geçen seferki kiloları koru, tükenişe gitme, her sette 1–2 tekrar içeride bırak.</p></aside>'; }
+    if (out.deload) { out.html += '<aside class="tip"><b>DELOAD ZAMANI · ' + out.deload + ' HAFTA ARALIKSIZ</b><p>Eklemler ve sinir sistemi için bir hafta hafiflet: aynı kilolar, set sayısının yarısı, tükenişe gitme. Sonraki hafta daha güçlü dönersin.</p><button type="button" class="mini" data-act="deload">Bu hafta deload yapıyorum</button></aside>'; }
+    if (day.tip) { out.html += '<aside class="tip"><b>KOÇ ÖNERİSİ</b><p>' + day.tip + '</p></aside>'; }
+    return out;
+  }
   function renderWeek() {
     var weekEl = document.getElementById('week');
     if (!weekEl) { return; }
@@ -1166,7 +1211,11 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
       h += '<button type="button" class="wk st-' + r.st + (i === next ? ' next' : '') + '" data-i="' + i + '" aria-pressed="' + (i === sel) + '">' +
         '<span class="pl" style="--c:var(--' + day.type + ')"></span><span class="dtx"><b>' + day.title + '</b><span>' + line + '</span></span></button>';
     });
-    weekEl.innerHTML = '<div class="week-h"><span>BU HAFTA</span><b>' + doneN + ' / ' + liftN + ' antrenman</b></div><div class="rgrid">' + h + '</div>';
+    var day = PROGRAM[sel], notes = dayNotes(day, findDoc(day.sid));
+    var chips = (notes.warn ? '<span class="chipw">⚠ 48 saat dolmadı</span>' : '') + (notes.sleep ? '<span class="chipw">⚠ Az uyku</span>' : '') + (notes.deload ? '<span class="chipw">Deload zamanı</span>' : '');
+    var line = '<button type="button" class="brief" data-act="brief" aria-expanded="' + briefOpen + '" aria-controls="brief-p"><span class="brief-t"><b>Bu hafta ' + doneN + '/' + liftN + '</b> · ' +
+      (next >= 0 ? 'Öneri: ' + titleCase(PROGRAM[next].title) : 'Hafta tamam') + '</span>' + chips + '<span class="brief-c" aria-hidden="true">▾</span></button>';
+    weekEl.innerHTML = line + (briefOpen ? '<div id="brief-p" class="brief-w"><div class="rgrid">' + h + '</div>' + notes.html + '</div>' : '');
   }
 
   function renderStrip() {
@@ -1260,11 +1309,11 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
         var lw = lastVal(last, j, p, 'w'), lr = lastVal(last, j, p, 'r');
         var who = (e.parts.length > 1 ? pn + ', ' : '') + 'set ' + (j + 1);
         h += '<div class="part">' + (e.parts.length > 1 ? '<span class="plabel">' + pn + '</span>' : '') +
-          '<label class="fld"><input class="in" id="in-' + e.id + '-' + j + '-' + p + '-w" data-k="w" data-p="' + p + '" type="text" inputmode="decimal" autocomplete="off" aria-label="' + who + ' ' + (e.bw ? 'ek kilo' : 'kilo') + '" placeholder="' + (lw !== null ? fmt(lw) : '–') + '" data-ph="' + (lw !== null ? fmt(lw) : '') + '" value="' + fmt(s.w[p]) + '"><span>' + (e.bw ? '+kg' : 'kg') + '</span></label>' +
-          '<label class="fld"><input class="in" id="in-' + e.id + '-' + j + '-' + p + '-r" data-k="r" data-p="' + p + '" type="text" inputmode="decimal" autocomplete="off" aria-label="' + who + ' tekrar" placeholder="' + (lr !== null ? fmt(lr) : (e.reps ? e.reps[0] + '–' + e.reps[1] : '–')) + '" data-ph="' + (lr !== null ? fmt(lr) : '') + '" value="' + fmt(s.r[p]) + '"><span>tekrar</span></label></div>';
+          '<label class="fld"><input class="in" id="in-' + e.id + '-' + j + '-' + p + '-w" data-k="w" data-p="' + p + '" type="text" inputmode="decimal" autocomplete="off" aria-label="' + who + ' ' + (e.bw ? 'ek kilo' : 'kilo') + '" placeholder="' + (lw !== null ? fmt(lw) : '–') + '" data-ph="' + (lw !== null ? fmt(lw) : '') + '" value="' + fmt(s.w[p]) + '"' + (autoMark[autoKey(doc, e.id, j, p, 'w')] ? ' data-auto="1"' : '') + '><span>' + (e.bw ? '+kg' : 'kg') + '</span></label>' +
+          '<label class="fld"><input class="in" id="in-' + e.id + '-' + j + '-' + p + '-r" data-k="r" data-p="' + p + '" type="text" inputmode="decimal" autocomplete="off" aria-label="' + who + ' tekrar" placeholder="' + (lr !== null ? fmt(lr) : (e.reps ? e.reps[0] + '–' + e.reps[1] : '–')) + '" data-ph="' + (lr !== null ? fmt(lr) : '') + '" value="' + fmt(s.r[p]) + '"' + (autoMark[autoKey(doc, e.id, j, p, 'r')] ? ' data-auto="1"' : '') + '><span>tekrar</span></label></div>';
       });
       h += '</div><button type="button" class="chk" aria-pressed="' + !!s.d + '" aria-label="Set ' + (j + 1) + ' tamamlandı">' + CHECK + '</button></div>';
-      h += '<div class="fb" data-j="' + j + '" role="status" hidden></div>';
+      h += '<p class="cap" data-j="' + j + '" hidden></p><div class="fb" data-j="' + j + '" role="status" hidden></div>';
     });
     var added = (doc.add && doc.add[e.id]) || 0;
     h += '</div><div class="setbar">' + (added ? '<button type="button" class="mini" data-act="set-del" data-ex="' + e.id + '">Son seti sil</button>' : '') +
@@ -1303,6 +1352,23 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
         ? '<button type="button" class="mini" data-act="fb-apply" data-ex="' + e.id + '" data-j="' + nextJ + '" data-p="' + adv.p + '" data-w="' + adv.w + '">Set ' + (nextJ + 1) + '’e ' + fmt(adv.w) + ' kg yaz</button>' : '');
       fb.hidden = false;
     });
+    /* under the next set: last time's numbers and today's range */
+    var last = lastFor(e.id, doc), nextJ0 = -1;
+    for (var q = 0; q < arr.length; q++) { if (!arr[q].d) { nextJ0 = q; break; } }
+    var caps = card.querySelectorAll('.cap');
+    for (var ci = 0; ci < caps.length; ci++) {
+      var cj = +caps[ci].getAttribute('data-j');
+      if (cj !== nextJ0) { caps[ci].hidden = true; continue; }
+      var prev = e.parts.map(function (pn, p) {
+        var lw = lastVal(last, cj, p, 'w'), lr = lastVal(last, cj, p, 'r');
+        if (lw === null && lr === null) { return ''; }
+        return (e.parts.length > 1 ? pn.split(' ')[0] + ' ' : '') + (lw !== null ? (e.bw ? '+' : '') + fmt(lw) + ' kg × ' : '') + (lr !== null ? fmt(lr) : '–');
+      }).filter(Boolean).join(' | ');
+      var range = e.reps ? e.reps[0] + '–' + e.reps[1] + ' tekrar' : 'maksimum tekrar';
+      caps[ci].innerHTML = (prev ? 'Geçen sefer <b>' + prev + '</b> · hedef <b>' + range + '</b>' : 'Hedef <b>' + range + '</b>');
+      caps[ci].hidden = false;
+    }
+    card.querySelectorAll('input.in').forEach(function (inp) { inp.classList.toggle('auto', inp.getAttribute('data-auto') === '1'); });
     var hint = card.querySelector('.hint');
     var show = false;
     if (all && e.reps) {
@@ -1355,6 +1421,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
     var doc = cur;
     var eyebrow = longDate(doc.date) + (doc.date === today ? ' · bugün' : '');
     var h = '';
+    if (day.type === 'rest') { var rn = dayNotes(day, doc); if (rn.warn) { h += rn.html; } }
     if (editKey && log[editKey] === doc) {
       h += '<div class="editbar"><span>Geçmiş kaydı düzenliyorsun · ' + shortDate(doc.date) + '</span><button type="button" class="mini" data-act="edit-exit">Bugüne dön</button></div>';
     }
@@ -1369,17 +1436,6 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
       var total = totalSets(day, doc);
       h += '<p class="meta">' + day.ex.length + ' hareket · ' + total + ' set' + (day.extra ? ' · ' + day.extra : '') + '</p>' +
         '<div class="prog"><span class="track"><i class="fill" id="fill"></i></span><span id="plabel"></span></div></section>';
-      var warn = spacingNote(day, doc);
-      if (warn) { h += '<aside class="tip warn"><b>KOÇ UYARISI</b><p>' + warn + '</p></aside>'; }
-      var slp = daily[today] && daily[today].sleep;
-      if (doc.date === today && slp && slp < 6) {
-        h += '<aside class="tip warn"><b>AZ UYKU · ' + fmt(slp) + ' SAAT</b><p>Bugün rekor günü değil. Geçen seferki kiloları koru, tükenişe gitme, her sette 1–2 tekrar içeride bırak.</p></aside>';
-      }
-      var tw = trainWeeks();
-      if (tw >= 7 && doneCount(doc, day) === 0 && !(profile.deloadAt && dayDiff(today, profile.deloadAt) < 42)) {
-        h += '<aside class="tip"><b>DELOAD ZAMANI · ' + tw + ' HAFTA ARALIKSIZ</b><p>Eklemler ve sinir sistemi için bir hafta hafiflet: aynı kilolar, set sayısının yarısı, tükenişe gitme. Sonraki hafta daha güçlü dönersin.</p><button type="button" class="mini" data-act="deload">Bu hafta deload yapıyorum</button></aside>';
-      }
-      if (day.tip) { h += '<aside class="tip"><b>KOÇ ÖNERİSİ</b><p>' + day.tip + '</p></aside>'; }
       day.ex.forEach(function (e, i) { h += exHTML(e, i, doc, i === 0); });
       h += '<input class="tin" id="sess-note" type="text" maxlength="200" autocomplete="off" aria-label="Seans notu" placeholder="Seans notu (ör. omuz hafif ağrıdı, enerji düşüktü)" value="' + esc(doc.note) + '">';
       h += doc.fin ? summaryHTML(doc, day) : '<button type="button" class="btn" data-act="finish">Antrenmanı bitir</button>';
@@ -1394,7 +1450,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
   }
 
   function renderTraining() {
-    view.innerHTML = '<nav id="week" aria-label="Haftalık program"></nav><div id="strip" class="strip"></div><div id="day"></div>';
+    view.innerHTML = '<div id="week" class="brief-w"></div><div id="strip" class="strip"></div><div id="day"></div>';
     renderWeek(); renderStrip(); renderDay();
   }
 
@@ -1828,6 +1884,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
     if (push) { try { history.replaceState(null, '', '#' + t); } catch (e) { try { location.hash = t; } catch (e2) {} } }
     render();
     window.scrollTo(0, 0);
+    if (t === 'antrenman') { revealNextSet(false); }
   }
   document.querySelector('.tabbar').addEventListener('click', function (ev) {
     var b = ev.target.closest('.tb');
@@ -1877,6 +1934,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
     var e = exById(set.getAttribute('data-ex'));
     var sj = +set.getAttribute('data-j'), sk = t.getAttribute('data-k'), sp = +t.getAttribute('data-p');
     var s = setsOf(cur, e)[sj];
+    if (t.getAttribute('data-auto')) { t.removeAttribute('data-auto'); t.classList.remove('auto'); delete autoMark[autoKey(cur, e.id, sj, sp, sk)]; }
     var oldV = s[sk][sp], newV = num(t.value);
     s[sk][sp] = newV;
     if (sk === 'w') { carryWeight(e, sj, sp, oldV, newV); }
@@ -1935,7 +1993,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
 
   view.addEventListener('click', function (ev) {
     var wk = ev.target.closest('.wk');
-    if (wk) { sel = +wk.getAttribute('data-i'); editKey = null; renderDay(); renderWeek(); return; }
+    if (wk) { sel = +wk.getAttribute('data-i'); editKey = null; briefOpen = false; renderDay(); renderWeek(); revealNextSet(false); return; }
     var chk = ev.target.closest('.set .chk');
     if (chk) { toggleSet(chk); return; }
     var b = ev.target.closest('[data-act]');
@@ -1949,6 +2007,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
         confirmSheet(fdn ? ftot + ' setten ' + fdn + '’' + possSuffix(fdn) + ' yapıldı. Yine de bitirelim mi?' : 'Hiç set işaretlenmedi. Yine de bitirelim mi?', 'Devam et', 'Bitir', finishNow);
       }
     }
+    else if (act === 'brief') { briefOpen = !briefOpen; renderWeek(); }
     else if (act === 'edit-exit') { editKey = null; sel = startSel(); renderDay(); renderWeek(); window.scrollTo(0, 0); }
     else if (act === 'hist') { showDetail([b.getAttribute('data-k')]); }
     else if (act === 'hist-day') {
@@ -2036,7 +2095,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
       toast('Kalori hedefi güncellendi: ' + (kcalGoal() || 0).toLocaleString('tr-TR') + ' kcal.');
     }
     else if (act === 'kadj-reset') { profile.kadj = 0; profile.kadjAt = ''; touchProfile(); render(); }
-    else if (act === 'deload') { profile.deloadAt = today; touchProfile(); renderDay(); toast('Deload haftası kaydedildi.'); }
+    else if (act === 'deload') { profile.deloadAt = today; touchProfile(); renderDay(); renderWeek(); toast('Deload haftası kaydedildi.'); }
     else if (act === 'food-del') {
       var dfid = b.getAttribute('data-fid');
       profile.foods = profile.foods.filter(function (f) { return f.id !== dfid; });
@@ -2049,6 +2108,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
     var e = exById(set.getAttribute('data-ex')), j = +set.getAttribute('data-j');
     var s = setsOf(cur, e)[j];
     var on = !s.d;
+    var filled = [], snap = clone(setsOf(cur, e)), sdoc = cur;
     if (on) {
       var inputs = set.querySelectorAll('input.in');
       for (var i = 0; i < inputs.length; i++) {
@@ -2056,6 +2116,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
         if (inp.value.trim() === '' && inp.getAttribute('data-ph')) {
           inp.value = inp.getAttribute('data-ph');
           s[inp.getAttribute('data-k')][+inp.getAttribute('data-p')] = num(inp.value);
+          filled.push({ k: inp.getAttribute('data-k'), p: +inp.getAttribute('data-p'), v: inp.value, inp: inp });
         }
       }
       /* a set needs reps; weight may stay empty (bodyweight = no added weight) but must be a number when written */
@@ -2084,13 +2145,46 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
     if (on) {
       startRest(e.rest); keepAwake();
       var pr = set.querySelector('.pr');
-      if (pr && !pr.hidden) { toast('Yeni rekor: ' + e.name); }
+      if (filled.length) {
+        /* quick log from last session: mark it and offer an undo */
+        filled.forEach(function (f) { autoMark[autoKey(sdoc, e.id, j, f.p, f.k)] = true; f.inp.setAttribute('data-auto', '1'); f.inp.classList.add('auto'); });
+        var fw = filled.filter(function (f) { return f.k === 'w'; }), fr = filled.filter(function (f) { return f.k === 'r'; });
+        var what = filled.length > 2 ? 'değerler' : (fw.length && fr.length ? fw[0].v + ' kg × ' + fr[0].v + ' tekrar' : (fr.length ? fr[0].v + ' tekrar' : fw[0].v + ' kg'));
+        toast('Geçen seferki ' + what + ' yazıldı', { ms: 6000, action: { label: 'Geri al', fn: function () {
+          var list = sdoc.sets[e.id];
+          snap.forEach(function (x, i) { list[i] = x; });
+          filled.forEach(function (f) { delete autoMark[autoKey(sdoc, e.id, j, f.p, f.k)]; });
+          touch(sdoc); stopRest();
+          if (tab === 'antrenman' && cur === sdoc) { renderDay(); renderWeek(); }
+          toast('Geri alındı.');
+        } } });
+      }
+      else if (pr && !pr.hidden) { toast('Yeni rekor: ' + e.name, { ms: 6000 }); }
       else {
         var adv = adviceFor(e, s, PROGRAM[sel].type === 'leg');
-        if (adv && adv.kind === 'up') { toast('Kilo hafif kaldı' + (adv.w !== null ? ', ' + fmt(adv.w) + ' kg’a çık.' : '.')); }
-        else if (adv && adv.kind === 'down') { toast('Kilo ağır geldi' + (adv.w ? ', ' + fmt(adv.w) + ' kg’a düş.' : '.')); }
+        if (adv && adv.kind === 'up') { toast('Kilo hafif kaldı' + (adv.w !== null ? ', ' + fmt(adv.w) + ' kg’a çık.' : '.'), { ms: 6000 }); }
+        else if (adv && adv.kind === 'down') { toast('Kilo ağır geldi' + (adv.w ? ', ' + fmt(adv.w) + ' kg’a düş.' : '.'), { ms: 6000 }); }
       }
+      revealNextSet(true);
     }
+  }
+
+  /* keep the next unfinished set in view, above the tab bar and the rest bar */
+  function revealNextSet(smooth) {
+    var go = function () {
+      var row = document.querySelector('#day .set:not(.done)');
+      if (!row) { return; }
+      var r = row.getBoundingClientRect();
+      var cap = row.nextElementSibling;
+      var bottom = (cap && cap.classList.contains('cap') && !cap.hidden) ? cap.getBoundingClientRect().bottom : r.bottom;
+      var tb = document.querySelector('.tabbar');
+      var limit = window.innerHeight - (tb ? tb.offsetHeight : 0) - (restEl.hidden ? 0 : restEl.offsetHeight) - 8;
+      if (r.top >= 8 && bottom <= limit) { return; }
+      var target = window.scrollY + r.top - Math.max(16, Math.min(window.innerHeight * 0.3, limit - (bottom - r.top) - 16));
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: Math.max(0, target), behavior: smooth && !reduce ? 'smooth' : 'auto' });
+    };
+    if (window.requestAnimationFrame) { requestAnimationFrame(go); } else { go(); }
   }
 
   /* ================= backup ================= */
@@ -2189,6 +2283,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
     restToken++;
     restLab.textContent = 'DİNLENME';
     restEl.hidden = false;
+    setRestH();
     clearInterval(restInt);
     tick();
     restInt = setInterval(tick, 250);
@@ -2199,7 +2294,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
     restLab.textContent = 'SIRADAKİ SET';
     beep();
     var tok = restToken;
-    setTimeout(function () { if (tok === restToken) { restEl.hidden = true; } }, 6000);
+    setTimeout(function () { if (tok === restToken) { restEl.hidden = true; setRestH(); } }, 6000);
   }
   document.getElementById('rest-add').addEventListener('click', function () {
     if (restEnd < Date.now()) { restEnd = Date.now(); }
@@ -2210,7 +2305,8 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
     tick();
     restInt = setInterval(tick, 250);
   });
-  function stopRest() { clearInterval(restInt); restToken++; restEl.hidden = true; }
+  function stopRest() { clearInterval(restInt); restToken++; restEl.hidden = true; setRestH(); }
+  function setRestH() { document.documentElement.style.setProperty('--rest-h', restEl.hidden ? '0px' : restEl.offsetHeight + 'px'); }
   document.getElementById('rest-skip').addEventListener('click', stopRest);
 
   /* ================= screen stays on while training ================= */
@@ -2307,6 +2403,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
   var h0 = location.hash.slice(1);
   tab = TABS.indexOf(h0) >= 0 ? h0 : 'antrenman';
   render();
+  if (tab === 'antrenman') { revealNextSet(false); }
   initCloud();
 })();
 </script>
