@@ -108,3 +108,10 @@ Yeni görevler buraya eklenir, biten görev işaretlenir.
   7. Kilo önerisinde alt ve üst sayı eşitse "6 tekrar hedefle" yazılır ("6–6" hatası).
   - Kapsam dışı: yazı boyutu cilası, sarı çubuk kontrastı, boş ekran düğmeleri, erişilebilirlik (aria, inert, h1).
   - Bitirince: `sw.js` VERSION 'v3'; boş test tarayıcısında 400 px, açık ve koyu temada dene; commit + push.
+- [x] GÖREV 4: Görsel cila. Veri modeli, program, koçluk kuralları ve GÖREV 3'teki antrenman ekranı düzeni aynen kalır.
+  1. En küçük yazılar en az 12 px (REKOR, takvim gün harfleri, RIR rozeti, "Sıradaki/Bekliyor", alt sekme adları); 400 px'te taşma/sıkışma yok, özellikle alt sekme çubuğu.
+  2. Açık temada bacak rengi daha koyu amber/hardal (grafik nesneler için en az 3:1); koyu tema rengi kalır; kas ve protein çubukları dahil; renk `:root` token'ından.
+  3. Boş ekran yönlendirmesi: Beslenme'de yemek yokken açıklama + "Yemek ekle"; Vücut'ta kilo/boy/yaş eksikken "Hedeflerini görmek için kilo, boy ve yaşını yaz" + ilgili alana götüren düğme.
+  4. "Yemek listeme ekle" ve tüm sekmelerde 44 px altındaki etkileşimli öğeler 44 px.
+  - Kapsam dışı: yeni özellik, palet/font değişikliği, antrenman ekranı düzeni, erişilebilirlik.
+  - Bitirince: `sw.js` VERSION 'v4'; boş test tarayıcısında 400 px, açık ve koyu temada 5 sekme; commit + push.
