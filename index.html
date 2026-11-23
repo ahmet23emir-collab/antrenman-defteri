@@ -97,24 +97,18 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 
 /* header */
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.brand { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; letter-spacing: .03em; line-height: 1; }
-.sync { display: inline-flex; align-items: center; gap: 6px; font-size: .75rem; color: var(--ink-2); }
-.sync::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-2); }
-.sync[data-s="cloud"]::before { background: var(--done); }
+.brand { margin: 0; font-weight: 600; font-size: 1rem; line-height: 1.2; color: var(--ink-2); }
 
 /* section headings inside tabs */
-.sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: .75rem; font-weight: 700; letter-spacing: .06em; color: var(--ink-2); margin: 0; }
+.sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: .9rem; font-weight: 600; letter-spacing: 0; color: var(--ink-2); margin: 0; }
 .sec-h b { color: var(--ink); font-size: .85rem; letter-spacing: 0; font-variant-numeric: tabular-nums; }
-.page-t { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 2.6rem; line-height: .95; letter-spacing: .01em; }
 
 /* this week */
-.week-h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; font-size: .75rem; font-weight: 700; letter-spacing: .06em; color: var(--ink-2); }
-.week-h b { color: var(--ink); font-size: .85rem; letter-spacing: 0; font-variant-numeric: tabular-nums; }
 .rgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
 .wk { appearance: none; cursor: pointer; min-width: 0; text-align: left; display: flex; align-items: center; gap: 8px; padding: 9px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 .wk .pl { flex: none; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at center, var(--surface) 0 2.5px, var(--c) 3px); }
 .wk .dtx { display: grid; gap: 2px; min-width: 0; }
-.wk .dtx b { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; line-height: 1; letter-spacing: .02em; }
+.wk .dtx b { font-weight: 600; font-size: .95rem; line-height: 1.15; }
 .wk .dtx span { display: inline-flex; align-items: center; gap: 3px; font-size: .75rem; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .wk .dtx svg { width: 11px; height: 11px; color: var(--done); }
 .wk.st-done .dtx span, .wk.next .dtx span { color: var(--ink); }
@@ -123,7 +117,7 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 
 /* today strip on the training tab */
 .strip { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.strip .sl { font-size: .75rem; font-weight: 700; letter-spacing: .06em; color: var(--ink-2); width: 100%; }
+.strip .sl { font-size: .9rem; font-weight: 600; letter-spacing: 0; color: var(--ink); width: 100%; }
 .pill { appearance: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--line); background: var(--surface-2); border-radius: 99px; padding: 6px 12px 6px 8px; font-size: .85rem; font-weight: 600; min-height: 2.75rem; }
 .pill .bx { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; color: transparent; }
 .pill .bx svg { width: 12px; height: 12px; }
@@ -140,8 +134,8 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 .hero[data-type="rest"] { --day: var(--rest); --on-day: var(--on-rest); }
 .hero > * { position: relative; }
 .hero .plate { position: absolute; right: -18px; top: -18px; width: 84px; height: 84px; opacity: .2; color: var(--on-day); }
-.eyebrow { margin: 0; font-size: .75rem; font-weight: 700; letter-spacing: .08em; }
-.hero h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; line-height: 1; letter-spacing: .01em; text-wrap: balance; }
+.eyebrow { margin: 0; font-size: .85rem; font-weight: 500; }
+.hero h1 { margin: 0; font-weight: 600; font-size: 1.25rem; line-height: 1.15; text-wrap: balance; }
 .meta { margin: 0; font-size: .85rem; font-weight: 600; }
 .hero-r { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .prog { display: flex; align-items: center; gap: 10px; font-size: .85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -151,13 +145,14 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 
 /* coach tip */
 .tip { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 4px; }
-.tip b { font-size: .8rem; letter-spacing: .06em; }
+.tip b { font-size: .9rem; font-weight: 600; }
 .tip p { margin: 0; font-size: .92rem; color: var(--ink-2); line-height: 1.5; max-width: 62ch; }
 .tip.warn { background: var(--warn-soft); border-color: var(--warn); }
 .tip.warn b { color: var(--warn); }
 
 /* exercise card */
-.ex { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow); }
+.ex { background: none; border: 0; border-radius: 0; padding: 4px 0 0; display: flex; flex-direction: column; gap: 10px; box-shadow: none; }
+.ex + .ex { border-top: 1px solid var(--line); padding-top: 18px; margin-top: 4px; }
 .ex-h { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: 10px; align-items: start; }
 .ex-n { width: 2rem; height: 2rem; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); border: 1px solid var(--line); font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
 .ex-n svg { width: 18px; height: 18px; }
@@ -165,17 +160,17 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 .ex h3 { margin: 0; font-size: 1.02rem; line-height: 1.2; font-weight: 700; text-wrap: balance; }
 .sub { margin-top: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
 .tgt { font-size: .85rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.eff { font-size: .75rem; font-weight: 700; letter-spacing: .04em; border: 1px solid var(--line); background: var(--surface-2); border-radius: 99px; padding: 2px 9px; white-space: nowrap; }
-.last, .warm { margin: 0; font-size: .8rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.last b, .warm b { color: var(--ink); font-weight: 600; }
+.eff { font-size: .75rem; font-weight: 600; letter-spacing: 0; border: 1px solid var(--line); background: var(--surface-2); border-radius: 99px; padding: 2px 9px; white-space: nowrap; }
+.last, .warm, .goal, .cap { margin: 0; font-size: .9rem; line-height: 1.4; color: var(--ink); font-variant-numeric: tabular-nums; }
+.last b, .warm b, .goal b, .cap b { color: var(--ink-2); font-weight: 600; font-size: .8rem; margin-right: 4px; }
 
 .sets { display: flex; flex-direction: column; gap: 6px; }
-.set { position: relative; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) 3.2rem; gap: 8px; align-items: center; padding: 6px 6px 6px 8px; border-radius: 12px; background: var(--surface-2); transition: background .15s; }
+.set { position: relative; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) 3.2rem; gap: 8px; align-items: center; padding: 6px 6px 6px 8px; border-radius: 12px; background: var(--surface); transition: background .15s; }
 .set.done { background: var(--done-soft); }
-.set .fld input { height: 3.2rem; font-size: 1.45rem; }
+.set .fld input { height: 3.2rem; font-size: 1.45rem; background: var(--bg); }
 .set .fld input::placeholder { font-size: 1.05rem; font-weight: 400; }
 .sn { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: var(--ink-2); text-align: center; }
-.pr { position: absolute; left: 4px; top: -8px; font-size: .75rem; font-weight: 800; letter-spacing: .06em; background: var(--leg); color: var(--on-leg); border-radius: 99px; padding: 1px 6px; }
+.pr { position: absolute; left: 4px; top: -8px; font-size: .75rem; font-weight: 700; letter-spacing: 0; background: var(--leg); color: var(--on-leg); border-radius: 99px; padding: 1px 6px; }
 .parts { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .part { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
 .plabel { grid-column: 1 / -1; font-size: .75rem; font-weight: 700; color: var(--ink-2); }
@@ -218,7 +213,7 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 .trk-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .trk-top b { font-family: var(--font-display); font-weight: 800; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
 .trk-top b small { font-size: 1.1rem; color: var(--ink-2); }
-.trk-top span { font-size: .8rem; font-weight: 700; letter-spacing: .06em; color: var(--ink-2); }
+.trk-top span { font-size: .9rem; font-weight: 600; color: var(--ink); }
 .bar2 { height: 10px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
 .bar2 i { display: block; height: 100%; width: 0; border-radius: 99px; background: var(--c, var(--pull)); transition: width .25s; }
 .btns { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -261,7 +256,7 @@ details.sess summary { list-style: none; cursor: pointer; padding: 12px; display
 details.sess summary::-webkit-details-marker { display: none; }
 details.sess .pl { width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at center, var(--surface) 0 2.5px, var(--c) 3px); }
 .ss-t { display: grid; gap: 1px; min-width: 0; }
-.ss-t b { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; line-height: 1; letter-spacing: .02em; }
+.ss-t b { font-weight: 600; font-size: 1rem; line-height: 1.2; }
 .ss-t span { font-size: .78rem; color: var(--ink-2); }
 .ss-r { font-size: .8rem; color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
 .ss-d { padding: 0 12px 12px; display: grid; gap: 6px; }
@@ -284,7 +279,7 @@ details.notes[open] summary::after { content: "–"; }
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-bottom: 10px; }
 .rest-in { pointer-events: auto; width: 100%; max-width: 34rem; background: var(--bar); color: var(--on-bar); border-radius: 16px; padding: 10px 10px 10px 16px; display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 30px -8px rgba(0,0,0,.45); }
 .rest-t { display: grid; gap: 0; flex: 1; min-width: 0; }
-.rest-l { font-size: .75rem; font-weight: 700; letter-spacing: .06em; opacity: .8; }
+.rest-l { font-size: .85rem; font-weight: 600; opacity: .85; }
 .rest-time { font-family: var(--font-display); font-weight: 800; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
 .rb { appearance: none; border: 1.5px solid currentColor; background: transparent; color: inherit; border-radius: 10px; min-height: 2.75rem; min-width: 2.75rem; padding: 0 12px; font-weight: 700; font-size: .9rem; cursor: pointer; }
 
@@ -315,9 +310,7 @@ textarea.dump { width: 100%; min-height: 8rem; font: .75rem/1.4 ui-monospace, Me
 .dn-m em { font-style: normal; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 /* today's target and stall note inside an exercise card */
-.goal { margin: 0; font-size: .92rem; font-variant-numeric: tabular-nums; border-left: 3px solid var(--ink); padding: 2px 0 2px 8px; }
-.goal.stall { border-color: var(--warn); color: var(--ink-2); }
-.goal.stall b { color: var(--warn); }
+.goal.stall b { color: var(--warn); font-size: .9rem; }
 details.how { border-top: 1px solid var(--line); margin-top: 2px; }
 details.how summary { list-style: none; cursor: pointer; padding: 0; min-height: 2.75rem; align-items: center; font-size: .8rem; font-weight: 700; color: var(--ink-2); display: flex; justify-content: space-between; }
 details.how summary::-webkit-details-marker { display: none; }
@@ -341,7 +334,8 @@ details.how[open] summary::after { content: "–"; }
 .legend i { margin-left: 6px; }
 
 /* per-set coaching feedback */
-.fb { margin: 0; font-size: .84rem; line-height: 1.4; border-radius: 10px; padding: 8px 10px; display: grid; gap: 6px; background: var(--surface-2); }
+.fb { margin: 0; font-size: .88rem; line-height: 1.4; border-radius: 10px; padding: 0 4px; display: grid; gap: 6px; background: none; color: var(--ink-2); }
+.fb.up, .fb.down { padding: 8px 10px; color: var(--ink); }
 .fb b { font-weight: 700; }
 .fb.up { background: var(--done-soft); }
 .fb.down { background: var(--warn-soft); }
@@ -355,7 +349,7 @@ details.how[open] summary::after { content: "–"; }
 .mrow em { font-style: normal; font-variant-numeric: tabular-nums; color: var(--ink-2); white-space: nowrap; }
 .meal { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 8px; }
 .meal-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
-.meal-h b { font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; line-height: 1; letter-spacing: .02em; }
+.meal-h b { font-weight: 600; font-size: 1.05rem; line-height: 1.2; }
 .meal-h span { font-size: .8rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .fi { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); }
 .fi-t { display: grid; gap: 1px; min-width: 0; }
@@ -383,7 +377,7 @@ details.how[open] summary::after { content: "–"; }
 .sheet { position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: flex; align-items: flex-end; justify-content: center;
   padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
 .sheet-in { width: 100%; max-width: 34rem; max-height: calc(100dvh - 32px - env(safe-area-inset-top, 0px)); overflow: auto; overscroll-behavior: contain; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: grid; gap: 12px; box-shadow: 0 20px 40px -12px rgba(0,0,0,.5); }
-.sheet-in h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; line-height: 1; letter-spacing: .02em; }
+.sheet-in h2 { margin: 0; font-weight: 600; font-size: 1.25rem; line-height: 1.2; }
 .sheet-in .muted { margin-top: -6px; }
 .sheet-msg { margin: 0; font-size: 1rem; line-height: 1.45; }
 .sheet-act { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
@@ -403,8 +397,7 @@ button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--in
 /* GÖREV 3: gym ergonomics */
 button, summary, label, a, input, select, textarea, .chk { touch-action: manipulation; }
 .toast-a { appearance: none; border: 1.5px solid currentColor; background: transparent; color: inherit; border-radius: 10px; min-height: 2.75rem; min-width: 2.75rem; padding: 0 12px; font: inherit; font-weight: 700; cursor: pointer; flex: none; }
-.cap { margin: -2px 0 0; padding: 0 4px; font-size: .85rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.cap b { color: var(--ink); font-weight: 700; }
+.cap { margin-top: -2px; padding: 0 4px; }
 .brief-w { display: grid; gap: 10px; }
 .brief { appearance: none; cursor: pointer; width: 100%; min-height: 2.75rem; text-align: left; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .brief-t { flex: 1 1 auto; font-size: .9rem; font-variant-numeric: tabular-nums; min-width: 0; }
@@ -424,8 +417,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
 
 <div class="app">
   <header class="top">
-    <p class="brand">ANTRENMAN DEFTERİ</p>
-    <span class="sync" id="sync" data-s="local">Bu cihazda kayıtlı</span>
+    <p class="brand">Antrenman Defteri</p>
   </header>
   <main id="view"></main>
 </div>
@@ -434,7 +426,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
 
 <div class="rest" id="rest" hidden>
   <div class="rest-in" role="timer">
-    <div class="rest-t"><span class="rest-l" id="rest-l">DİNLENME</span><span class="rest-time" id="rest-time">0:00</span></div>
+    <div class="rest-t"><span class="rest-l" id="rest-l">Dinlenme</span><span class="rest-time" id="rest-time">0:00</span></div>
     <button type="button" class="rb" id="rest-add">+15 sn</button>
     <button type="button" class="rb" id="rest-skip">Geç</button>
   </div>
@@ -604,7 +596,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
   function catalogById(id) { for (var i = 0; i < CATALOG.length; i++) { if (CATALOG[i].id === id) { return CATALOG[i]; } } return null; }
 
   /* ================= foods (approximate values per portion) ================= */
-  var MEALS = [['kahvalti', 'KAHVALTI'], ['ogle', 'ÖĞLE'], ['aksam', 'AKŞAM'], ['ara', 'ARA ÖĞÜN']];
+  var MEALS = [['kahvalti', 'Kahvaltı'], ['ogle', 'Öğle'], ['aksam', 'Akşam'], ['ara', 'Ara öğün']];
   function F(id, name, por, kcal, p, c, f) { return { id: id, name: name, por: por, kcal: kcal, p: p, c: c, f: f }; }
   var FOODS = [
     F('yulaf-yogurt', 'Yulaflı yoğurt kasesi', '50 g yulaf + 200 g yoğurt', 315, 14, 42, 10),
@@ -785,6 +777,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
   var wq = { inflight: {}, pending: {}, timers: {}, retried: {} };
   var syncEl = document.getElementById('sync');
   function setSync(kind) {
+    if (!syncEl) { return; }
     syncEl.setAttribute('data-s', kind);
     syncEl.textContent = 'Bu cihazda kayıtlı';
   }
@@ -1198,10 +1191,10 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     if (doc.date === today && slp && slp < 6) { out.sleep = slp; }
     var tw = trainWeeks();
     if (tw >= 7 && doneCount(doc, day) === 0 && !(profile.deloadAt && dayDiff(today, profile.deloadAt) < 42)) { out.deload = tw; }
-    if (out.warn) { out.html += '<aside class="tip warn"><b>KOÇ UYARISI</b><p>' + out.warn + '</p></aside>'; }
-    if (out.sleep) { out.html += '<aside class="tip warn"><b>AZ UYKU · ' + fmt(out.sleep) + ' SAAT</b><p>Bugün rekor günü değil. Geçen seferki kiloları koru, tükenişe gitme, her sette 1–2 tekrar içeride bırak.</p></aside>'; }
-    if (out.deload) { out.html += '<aside class="tip"><b>DELOAD ZAMANI · ' + out.deload + ' HAFTA ARALIKSIZ</b><p>Eklemler ve sinir sistemi için bir hafta hafiflet: aynı kilolar, set sayısının yarısı, tükenişe gitme. Sonraki hafta daha güçlü dönersin.</p><button type="button" class="mini" data-act="deload">Bu hafta deload yapıyorum</button></aside>'; }
-    if (day.tip) { out.html += '<aside class="tip"><b>KOÇ ÖNERİSİ</b><p>' + day.tip + '</p></aside>'; }
+    if (out.warn) { out.html += '<aside class="tip warn"><b>Koç uyarısı</b><p>' + out.warn + '</p></aside>'; }
+    if (out.sleep) { out.html += '<aside class="tip warn"><b>Az uyku · ' + fmt(out.sleep) + ' saat</b><p>Bugün rekor günü değil. Geçen seferki kiloları koru, tükenişe gitme, her sette 1–2 tekrar içeride bırak.</p></aside>'; }
+    if (out.deload) { out.html += '<aside class="tip"><b>Deload zamanı · ' + out.deload + ' hafta aralıksız</b><p>Eklemler ve sinir sistemi için bir hafta hafiflet: aynı kilolar, set sayısının yarısı, tükenişe gitme. Sonraki hafta daha güçlü dönersin.</p><button type="button" class="mini" data-act="deload">Bu hafta deload yapıyorum</button></aside>'; }
+    if (day.tip) { out.html += '<aside class="tip"><b>Koç önerisi</b><p>' + day.tip + '</p></aside>'; }
     return out;
   }
   function renderWeek() {
@@ -1213,7 +1206,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
       if (day.type !== 'rest') { liftN++; if (r.st === 'done') { doneN++; } }
       var line = r.st === 'done' ? CHECK + shortDate(r.date) : (r.st === 'part' ? 'Yarım kaldı' : (i === next ? 'Sıradaki' : 'Bekliyor'));
       h += '<button type="button" class="wk st-' + r.st + (i === next ? ' next' : '') + '" data-i="' + i + '" aria-pressed="' + (i === sel) + '">' +
-        '<span class="pl" style="--c:var(--' + day.type + ')"></span><span class="dtx"><b>' + day.title + '</b><span>' + line + '</span></span></button>';
+        '<span class="pl" style="--c:var(--' + day.type + ')"></span><span class="dtx"><b>' + titleCase(day.title) + '</b><span>' + line + '</span></span></button>';
     });
     var day = PROGRAM[sel], notes = dayNotes(day, findDoc(day.sid));
     var chips = (notes.warn ? '<span class="chipw">⚠ 48 saat dolmadı</span>' : '') + (notes.sleep ? '<span class="chipw">⚠ Az uyku</span>' : '') + (notes.deload ? '<span class="chipw">Deload zamanı</span>' : '');
@@ -1225,7 +1218,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
   function renderStrip() {
     var el = document.getElementById('strip');
     if (!el) { return; }
-    var dd = daily[today], h = '<span class="sl">BUGÜN</span>';
+    var dd = daily[today], h = '<span class="sl">Bugün</span>';
     profile.supps.forEach(function (s) {
       var on = !!(dd && dd.s[s.id]);
       h += '<button type="button" class="pill" data-act="supp" data-sid="' + esc(s.id) + '" aria-pressed="' + on + '"><span class="bx">' + CHECK + '</span>' + esc(s.name.split(' (')[0]) + '</button>';
@@ -1239,7 +1232,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     if (e.bw || !last) { return ''; }
     var w = lastVal(last, 0, 0, 'w');
     if (!w || w < 20) { return ''; }
-    return '<p class="warm"><b>Isınma:</b> ' + fmt(round25(w * 0.5)) + ' kg × 6 · ' + fmt(round25(w * 0.75)) + ' kg × 3</p>';
+    return '<p class="warm"><b>Isınma</b> ' + fmt(round25(w * 0.5)) + ' kg × 6 · ' + fmt(round25(w * 0.75)) + ' kg × 3</p>';
   }
 
   /* today's target, from the last session: add a rep, or add weight once every set hit the top of the range */
@@ -1258,7 +1251,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
       if (minR < lo) { return pre + wt(w) + lo + '+ tekrar (önce aralığa gir)'; }
       return pre + wt(w) + (minR + 1) + '+ tekrar (geçen seferden 1 fazla)';
     }).filter(Boolean);
-    return parts.length ? '<p class="goal"><b>Bugünkü hedef:</b> ' + parts.join('  |  ') + '</p>' : '';
+    return parts.length ? '<p class="goal"><b>Bugünkü hedef</b> ' + parts.join('  |  ') + '</p>' : '';
   }
   /* no progress across the last three sessions of a lift */
   function stallLine(e, doc) {
@@ -1303,12 +1296,12 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
       '<div class="ex-h"><span class="ex-n">' + (idx + 1) + '</span><div><h3>' + e.name + '</h3>' +
       '<div class="sub"><span class="tgt">' + tgt + '</span>' + (e.eff ? '<span class="eff">' + e.eff + '</span>' : '') + '</div></div></div>';
     if (first) { h += warmLine(e, last); }
-    if (profile.notes[e.id]) { h += '<p class="last"><b>Ayarım:</b> ' + esc(profile.notes[e.id]) + '</p>'; }
-    if (last) { h += '<p class="last"><b>Geçen sefer:</b> ' + setsLine(e, last) + '</p>'; }
+    if (profile.notes[e.id]) { h += '<p class="last"><b>Ayarım</b> ' + esc(profile.notes[e.id]) + '</p>'; }
+    if (last) { h += '<p class="last"><b>Geçen sefer</b> ' + setsLine(e, last) + '</p>'; }
     h += targetLine(e, last) + stallLine(e, doc);
     h += '<div class="sets">';
     arr.forEach(function (s, j) {
-      h += '<div class="set' + (s.d ? ' done' : '') + '" data-ex="' + e.id + '" data-j="' + j + '"><span class="pr" hidden>REKOR</span><span class="sn">' + (j + 1) + '</span><div class="parts">';
+      h += '<div class="set' + (s.d ? ' done' : '') + '" data-ex="' + e.id + '" data-j="' + j + '"><span class="pr" hidden>Rekor</span><span class="sn">' + (j + 1) + '</span><div class="parts">';
       e.parts.forEach(function (pn, p) {
         var lw = lastVal(last, j, p, 'w'), lr = lastVal(last, j, p, 'r');
         var who = (e.parts.length > 1 ? pn + ', ' : '') + 'set ' + (j + 1);
@@ -1369,7 +1362,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
         return (e.parts.length > 1 ? pn.split(' ')[0] + ' ' : '') + (lw !== null ? (e.bw ? '+' : '') + fmt(lw) + ' kg × ' : '') + (lr !== null ? fmt(lr) : '–');
       }).filter(Boolean).join(' | ');
       var range = e.reps ? e.reps[0] + '–' + e.reps[1] + ' tekrar' : 'maksimum tekrar';
-      caps[ci].innerHTML = (prev ? 'Geçen sefer <b>' + prev + '</b> · hedef <b>' + range + '</b>' : 'Hedef <b>' + range + '</b>');
+      caps[ci].innerHTML = (prev ? '<b>Geçen sefer</b> ' + prev + ' · <b>hedef</b> ' + range : '<b>Hedef</b> ' + range);
       caps[ci].hidden = false;
     }
     card.querySelectorAll('input.in').forEach(function (inp) { inp.classList.toggle('auto', inp.getAttribute('data-auto') === '1'); });
@@ -1429,7 +1422,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     if (editKey && log[editKey] === doc) {
       h += '<div class="editbar"><span>Geçmiş kaydı düzenliyorsun · ' + shortDate(doc.date) + '</span><button type="button" class="mini" data-act="edit-exit">Bugüne dön</button></div>';
     }
-    h += '<section class="hero" data-type="' + day.type + '">' + PLATE + '<p class="eyebrow">' + eyebrow + '</p><h1>' + day.title + '</h1>';
+    h += '<section class="hero" data-type="' + day.type + '">' + PLATE + '<p class="eyebrow">' + eyebrow + '</p><h1>' + titleCase(day.title) + '</h1>';
     if (day.type === 'rest') {
       h += '<p class="meta">' + day.meta + '</p></section>';
       var done = doc.cardio.d;
@@ -1464,21 +1457,20 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     var taken = profile.supps.filter(function (s) { return dd && dd.s[s.id]; }).length;
     var water = dd ? dd.water : 0, wg = waterGoal(vd);
     var h = dayNav(taken + ' / ' + profile.supps.length + ' alındı');
-    h += '<h2 class="page-t">TAKVİYE &amp; SU</h2>';
 
     /* water */
-    h += '<section class="trk" style="--c:var(--pull)"><div class="trk-top"><span>SU</span><b>' + liters(water) + ' <small>/ ' + liters(wg) + ' L</small></b></div>' +
+    h += '<section class="trk" style="--c:var(--pull)"><div class="trk-top"><span>Su</span><b>' + liters(water) + ' <small>/ ' + liters(wg) + ' L</small></b></div>' +
       '<div class="bar2"><i style="width:' + Math.min(100, Math.round(water / wg * 100)) + '%"></i></div>' +
       '<div class="btns"><button type="button" data-act="water" data-v="250">+250 ml</button><button type="button" data-act="water" data-v="500">+500 ml</button><button type="button" data-act="water" data-v="1000">+1 L</button><button type="button" class="minus" data-act="water" data-v="-250" aria-label="250 ml çıkar">−</button></div>' +
       '<p class="note">' + (latestBw() ? 'Kilogram başına 35 ml' + (trainedOn(vd) ? ', antrenman günü +500 ml.' : '.') : 'Kilonu Vücut sekmesine yazınca hedef sana göre hesaplanır.') + ' Kreatin kullanırken suyu aksatma.</p></section>';
 
     /* checklist */
-    h += '<div class="sec-h"><span>TAKVİYELER</span><button type="button" class="mini" data-act="supp-edit">' + (suppEdit ? 'Bitti' : 'Düzenle') + '</button></div>';
+    h += '<div class="sec-h"><span>Takviyeler</span><button type="button" class="mini" data-act="supp-edit">' + (suppEdit ? 'Bitti' : 'Düzenle') + '</button></div>';
     if (!profile.supps.length) { h += '<p class="empty">Listen boş. Düzenle’ye dokunup kullandığın takviyeleri ekle.</p>'; }
     WHEN_ORDER.forEach(function (w) {
       var list = profile.supps.filter(function (s) { return s.when === w; });
       if (!list.length) { return; }
-      h += '<div class="sgroup"><p class="sec-h"><span>' + WHEN[w].toUpperCase() + '</span></p>';
+      h += '<div class="sgroup"><p class="sec-h"><span>' + WHEN[w] + '</span></p>';
       list.forEach(function (s) {
         var on = !!(dd && dd.s[s.id]);
         var dots = '';
@@ -1534,7 +1526,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
   }
   function trendTip() {
     var t = weightTrend();
-    if (t === null) { return '<aside class="tip"><b>KİLO GİDİŞATI</b><p>Son 3 haftada, aralarında en az 10 gün olan 3 tartı girince kalori hedefinin tutup tutmadığını burada söylerim.</p></aside>'; }
+    if (t === null) { return '<aside class="tip"><b>Kilo gidişatı</b><p>Son 3 haftada, aralarında en az 10 gün olan 3 tartı girince kalori hedefinin tutup tutmadığını burada söylerim.</p></aside>'; }
     var g = profile.goal, txt, adj = 0, per = (t > 0 ? '+' : '') + fmt(t) + ' kg / hafta';
     if (g === 'al') {
       if (t < 0.1) { txt = 'Kilo artmıyor. Kas yapmak için hafif fazla gerekir, günlük kaloriyi 200 artır.'; adj = 200; }
@@ -1553,7 +1545,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     var btn = '';
     if (adj && recent) { btn = '<p>Hedefi ' + shortDate(profile.kadjAt) + ' tarihinde güncelledin. Etkisini görmek için 2 hafta bekle.</p>'; }
     else if (adj) { btn = '<button type="button" class="mini" data-act="kadj" data-v="' + adj + '">Kalori hedefini ' + (adj > 0 ? '200 artır' : '200 azalt') + '</button>'; }
-    return '<aside class="tip' + (adj ? ' warn' : '') + '"><b>KİLO GİDİŞATI · ' + per + '</b><p>' + txt + '</p>' + btn + '</aside>';
+    return '<aside class="tip' + (adj ? ' warn' : '') + '"><b>Kilo gidişatı · ' + per + '</b><p>' + txt + '</p>' + btn + '</aside>';
   }
   function nutAvgLine() {
     var n = 0, k = 0, p = 0;
@@ -1589,7 +1581,6 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     var dd = daily[vd], yd = daily[addDays(vd, -1)];
     var t = dayTotals(dd), kg = kcalGoal(), pg = protGoal();
     var h = dayNav(Math.round(t.kcal).toLocaleString('tr-TR') + ' kcal');
-    h += '<h2 class="page-t">BESLENME</h2>';
     var noFood = !(dd && (dd.meals.length || dd.prot));
     var hr = new Date().getHours(), nextMeal = hr < 11 ? 'kahvalti' : (hr < 16 ? 'ogle' : 'aksam');
     h += '<section class="card macro">' +
@@ -1618,7 +1609,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
       h += '</section>';
     });
 
-    h += '<section class="trk" style="--c:var(--leg)"><div class="trk-top"><span>LİSTEDE OLMAYAN PROTEİN</span><b>' + Math.round(dd ? dd.prot : 0) + ' <small>g</small></b></div>' +
+    h += '<section class="trk" style="--c:var(--leg)"><div class="trk-top"><span>Listede olmayan protein</span><b>' + Math.round(dd ? dd.prot : 0) + ' <small>g</small></b></div>' +
       '<div class="btns"><button type="button" data-act="prot" data-v="10">+10 g</button><button type="button" data-act="prot" data-v="25">+25 g</button><button type="button" class="minus" data-act="prot" data-v="-10" aria-label="10 g çıkar">−</button></div>' +
       '<p class="note">Yemeği tek tek girmek istemediğin günlerde proteini buradan ekle.</p></section>';
 
@@ -1637,7 +1628,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
   function renderBody() {
     var dd = daily[today];
     var series = bwSeries();
-    var h = '<h2 class="page-t">VÜCUT</h2>';
+    var h = '';
     h += '<section class="card"><span class="lbl">Bugün · ' + shortDate(today) + '</span><div class="row2">' +
       '<label class="fld"><input id="bw-in" type="text" inputmode="decimal" autocomplete="off" aria-label="Kilo" placeholder="' + (latestBw() ? fmt(latestBw()) : 'Kilo') + '" value="' + fmt(dd && dd.bw) + '"><span>kg</span></label>' +
       '<label class="fld"><input id="waist-in" type="text" inputmode="decimal" autocomplete="off" aria-label="Bel çevresi" placeholder="Bel" value="' + fmt(dd && dd.waist) + '"><span>cm</span></label></div>' +
@@ -1725,7 +1716,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
   /* read-only view of one or more sessions; "Düzenle" opens the record in the Antrenman tab */
   function detailHTML(d) {
     var day = PROGRAM[idxOfSid(d.s)], key = keyOf(d.date, d.s);
-    var h = '<h2>' + day.title + '</h2><p class="muted">' + longDate(d.date) + (d.fin || day.type === 'rest' ? '' : ' · yarım kaldı') + '</p>';
+    var h = '<h2>' + titleCase(day.title) + '</h2><p class="muted">' + longDate(d.date) + (d.fin || day.type === 'rest' ? '' : ' · yarım kaldı') + '</p>';
     if (day.type === 'rest') {
       h += '<div class="dx"><b>Kardiyo</b><span class="skip">' + (d.cardio.m ? fmt(d.cardio.m) + ' dakika' : 'Süre yazılmadı') + '</span></div>';
     } else {
@@ -1777,7 +1768,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
       while (lifts.some(function (d) { return d.date >= ws && d.date <= addDays(ws, 6); })) { weeks++; ws = addDays(ws, -7); }
     }
 
-    var h = '<h2 class="page-t">GEÇMİŞ</h2>';
+    var h = '';
     h += '<section class="sum-grid"><div><b>' + last30.length + '</b><span>antrenman · 30 gün</span></div>' +
       '<div><b>' + (vol30 >= 10000 ? fmt1(vol30 / 1000) + ' t' : Math.round(vol30).toLocaleString('tr-TR')) + '</b><span>' + (vol30 >= 10000 ? 'hacim · 30 gün' : 'kg hacim · 30 gün') + '</span></div>' +
       '<div><b>' + weeks + '</b><span>hafta üst üste</span></div></section>';
@@ -1846,7 +1837,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     h += '</section>';
 
     /* session list */
-    h += '<p class="sec-h"><span>SEANSLAR</span><b>' + docs.length + '</b></p>';
+    h += '<p class="sec-h"><span>Seanslar</span><b>' + docs.length + '</b></p>';
     if (!docs.length) { h += '<p class="empty">Henüz kayıtlı antrenman yok. Antrenman sekmesinde ilk setini işaretle.</p>'; }
     docs.slice(0, 30).forEach(function (d) {
       var day = PROGRAM[idxOfSid(d.s)];
@@ -1857,11 +1848,11 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
         var st = docStats(d, day);
         right = st.sets + ' set<br>' + Math.round(st.vol).toLocaleString('tr-TR') + ' kg' + (st.dur ? '<br>' + st.dur + ' dk' : '');
       }
-      h += '<button type="button" class="sess" data-act="hist" data-k="' + esc(keyOf(d.date, d.s)) + '"><span class="pl" style="--c:var(--' + day.type + ')"></span><span class="ss-t"><b>' + day.title + '</b><span>' + longDate(d.date) + (d.fin || day.type === 'rest' ? '' : ' · yarım') + '</span></span><span class="ss-r">' + right + '</span></button>';
+      h += '<button type="button" class="sess" data-act="hist" data-k="' + esc(keyOf(d.date, d.s)) + '"><span class="pl" style="--c:var(--' + day.type + ')"></span><span class="ss-t"><b>' + titleCase(day.title) + '</b><span>' + longDate(d.date) + (d.fin || day.type === 'rest' ? '' : ' · yarım') + '</span></span><span class="ss-r">' + right + '</span></button>';
     });
 
     /* backup */
-    h += '<section class="card"><span class="lbl">Yedek</span><p class="muted">Kayıtların bu cihazda saklanıyor. Ara ara dosya olarak yedek al.</p><p class="muted">Eski uygulamadan aldığın yedeği buradan yükle.</p>' +
+    h += '<section class="card"><span class="lbl">Yedek · Bu cihazda kayıtlı</span><p class="muted">Kayıtların bu cihazda saklanıyor. Ara ara dosya olarak yedek al.</p><p class="muted">Eski uygulamadan aldığın yedeği buradan yükle.</p>' +
       '<div class="row2"><button type="button" class="btn ghost sm" data-act="export">Yedeği indir</button>' +
       '<label class="btn ghost sm" style="display:grid;place-items:center" for="import-file">Yedekten yükle</label></div>' +
       '<input class="filein" id="import-file" type="file" accept=".json,application/json"><div id="dump"></div></section>';
@@ -2296,7 +2287,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     primeAudio();
     restEnd = Date.now() + sec * 1000;
     restToken++;
-    restLab.textContent = 'DİNLENME';
+    restLab.textContent = 'Dinlenme';
     restEl.hidden = false;
     setRestH();
     clearInterval(restInt);
@@ -2306,7 +2297,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
   function endRest() {
     clearInterval(restInt);
     restTime.textContent = '0:00';
-    restLab.textContent = 'SIRADAKİ SET';
+    restLab.textContent = 'Sıradaki set';
     beep();
     var tok = restToken;
     setTimeout(function () { if (tok === restToken) { restEl.hidden = true; setRestH(); } }, 6000);
@@ -2315,7 +2306,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     if (restEnd < Date.now()) { restEnd = Date.now(); }
     restEnd += 15000;
     restToken++;
-    restLab.textContent = 'DİNLENME';
+    restLab.textContent = 'Dinlenme';
     clearInterval(restInt);
     tick();
     restInt = setInterval(tick, 250);

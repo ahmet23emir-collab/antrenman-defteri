@@ -115,3 +115,14 @@ Yeni görevler buraya eklenir, biten görev işaretlenir.
   4. "Yemek listeme ekle" ve tüm sekmelerde 44 px altındaki etkileşimli öğeler 44 px.
   - Kapsam dışı: yeni özellik, palet/font değişikliği, antrenman ekranı düzeni, erişilebilirlik.
   - Bitirince: `sw.js` VERSION 'v4'; boş test tarayıcısında 400 px, açık ve koyu temada 5 sekme; commit + push.
+- [ ] GÖREV 5: Sakin görünüm (anti-ui-slop denetiminden). Geri dönüş noktası: `v4-oncesi` etiketi. Veri modeli, program, koçluk kuralları, GÖREV 3'teki antrenman ekranı sırası, set satırı/✓ boyutları, 44 px dokunma alanları ve 12 px yazı sınırı aynen kalır. Koç geri bildirimi (öneri, rekor, uyarılar) kaldırılmaz, sadece görünümü hafifler.
+  - Commit 1 (yapı ve yazı), sw.js 'v5a':
+    1. Hareket kartlarında kenarlık/gölge yok; hareketler ince ayırıcı ve boşlukla ayrılır; dolu yüzey sadece set satırları.
+    2. Isınma, Geçen sefer, Bugünkü hedef ve set altı satır tek biçim (küçük gri etiket + normal yazı, sol çizgili blok yok). Arka planlı kutu sadece kilo artır/düşür önerisinde; "bu kiloda devam" sade tek satır.
+    3. Dev sayfa başlıkları kalkar, üstte küçük logo satırı kalır; "Bu cihazda kayıtlı" sadece Geçmiş'teki yedek kartında.
+    4. Dar büyük harfli yazı tipi sadece sayılarda; başlıklar ve öğün başlıkları gövde yazı tipinde, normal büyük-küçük harf, yarı kalın; harf aralıklı büyük harf etiketler normal yazıya döner.
+  - Commit 2 (renk), sw.js 'v5b':
+    5. Antrenman başlık kartı normal yüzey, plaka çizimi yok; tür rengi sadece küçük işaret ve ilerleme çubuğunda.
+    6. Nötrler sıcak: açık temada kırık beyaz/kum, koyu temada sıcak kömür; ✓ yeşili biraz solar ama net kalır.
+    7. İki temada tüm renk çiftleri ölçülür: metin ≥ 4,5:1, grafik ≥ 3:1 (bacak dahil); tür renkleri ayırt edilebilir kalır.
+  - Kapsam dışı: üçlü istatistik kutuları, takvim ekranı, yeni özellik, font değişikliği, erişilebilirlik.
