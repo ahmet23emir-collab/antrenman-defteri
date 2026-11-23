@@ -115,7 +115,7 @@ Yeni görevler buraya eklenir, biten görev işaretlenir.
   4. "Yemek listeme ekle" ve tüm sekmelerde 44 px altındaki etkileşimli öğeler 44 px.
   - Kapsam dışı: yeni özellik, palet/font değişikliği, antrenman ekranı düzeni, erişilebilirlik.
   - Bitirince: `sw.js` VERSION 'v4'; boş test tarayıcısında 400 px, açık ve koyu temada 5 sekme; commit + push.
-- [ ] GÖREV 5: Sakin görünüm (anti-ui-slop denetiminden). Geri dönüş noktası: `v4-oncesi` etiketi. Veri modeli, program, koçluk kuralları, GÖREV 3'teki antrenman ekranı sırası, set satırı/✓ boyutları, 44 px dokunma alanları ve 12 px yazı sınırı aynen kalır. Koç geri bildirimi (öneri, rekor, uyarılar) kaldırılmaz, sadece görünümü hafifler.
+- [x] GÖREV 5: Sakin görünüm (anti-ui-slop denetiminden). Geri dönüş noktası: `v4-oncesi` etiketi. Veri modeli, program, koçluk kuralları, GÖREV 3'teki antrenman ekranı sırası, set satırı/✓ boyutları, 44 px dokunma alanları ve 12 px yazı sınırı aynen kalır. Koç geri bildirimi (öneri, rekor, uyarılar) kaldırılmaz, sadece görünümü hafifler.
   - Commit 1 (yapı ve yazı), sw.js 'v5a':
     1. Hareket kartlarında kenarlık/gölge yok; hareketler ince ayırıcı ve boşlukla ayrılır; dolu yüzey sadece set satırları.
     2. Isınma, Geçen sefer, Bugünkü hedef ve set altı satır tek biçim (küçük gri etiket + normal yazı, sol çizgili blok yok). Arka planlı kutu sadece kilo artır/düşür önerisinde; "bu kiloda devam" sade tek satır.

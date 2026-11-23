@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Antrenman Defteri</title>
 <meta name="description" content="Kişisel antrenman, beslenme ve takviye takibi.">
-<meta name="theme-color" content="#E8EBED" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#101315" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#EEEAE3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171513" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -25,55 +25,55 @@ img { max-width: 100%; }
 [hidden]:not([hidden=until-found i]) { display: none !important; }
 
 /* Layout: one phone column with a fixed bottom tab bar (Antrenman, Takviye, Vücut, Geçmiş).
-   Plate colours mark session types: push = red 25 kg, pull = blue 20 kg, legs = yellow 15 kg, rest = grey.
-   Plate colours are fills only; text stays ink. Green means "done" everywhere. */
+   Session types keep their colours (push terracotta, pull slate blue, legs ochre, rest warm grey) as small marks and bars only;
+   surfaces are warm neutrals and text stays ink. Green means "done" everywhere. */
 :root {
   --font-display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
   --font-body: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --bg: #E8EBED;
-  --surface: #FFFFFF;
-  --surface-2: #F1F3F4;
-  --ink: #14181B;
-  --ink-2: #56616A;
-  --line: #D3D9DD;
-  --push: #C8362D;  --on-push: #FFFFFF;
-  --pull: #1E56B3;  --on-pull: #FFFFFF;
-  --leg: #B07800;   --on-leg: #1A1500;
-  --rest: #66727A;  --on-rest: #FFFFFF;
-  --done: #1B8A4B;  --on-done: #FFFFFF;  --done-soft: #DCF1E4;
-  --warn: #B4471B;  --warn-soft: #FBE7DC;
-  --bad: #C0262D;   --bad-soft: #FDE4E4;
-  --scrim: rgba(20,24,27,.45);
-  --bar: #14181B;   --on-bar: #F1F3F4;
-  --shadow: 0 1px 0 rgba(20,24,27,.04), 0 8px 20px -12px rgba(20,24,27,.3);
+  --bg: #EEEAE3;
+  --surface: #FBF9F5;
+  --surface-2: #F2EEE7;
+  --ink: #1F1B17;
+  --ink-2: #5E564C;
+  --line: #DCD5CA;
+  --push: #B5482F;  --on-push: #FFFFFF;
+  --pull: #3D5F8C;  --on-pull: #FFFFFF;
+  --leg: #9C6A00;   --on-leg: #FFFFFF;
+  --rest: #6F675D;  --on-rest: #FFFFFF;
+  --done: #2E7A4E;  --on-done: #FFFFFF;  --done-soft: #E2ECDF;
+  --warn: #A24E1E;  --warn-soft: #F5E5D7;
+  --bad: #B0261C;   --on-bad: #FFFFFF;   --bad-soft: #F8E2DD;
+  --scrim: rgba(31,27,23,.45);
+  --bar: #2A251F;   --on-bar: #F2EEE7;
+  --shadow: 0 1px 0 rgba(31,27,23,.04), 0 8px 20px -12px rgba(31,27,23,.25);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #101315; --surface: #1A1E21; --surface-2: #242A2E; --ink: #ECEFF1; --ink-2: #9AA5AC; --line: #2F373C;
-    --push: #E5584D; --on-push: #1A0B0A;
-    --pull: #5C93F0; --on-pull: #08162E;
-    --leg: #F6C62F;  --on-leg: #1A1500;
-    --rest: #8E999F; --on-rest: #101315;
-    --done: #3FBF78; --on-done: #07210F; --done-soft: #1B3527;
-    --warn: #F08A5D; --warn-soft: #3A2218;
-  --bad: #FF6B6B;  --bad-soft: #3D1A1C;
-  --scrim: rgba(0,0,0,.6);
-    --bad: #FF6B6B;  --bad-soft: #3D1A1C;
+    --bg: #171513; --surface: #211E1B; --surface-2: #2C2824; --ink: #EEE9E2; --ink-2: #A99F93; --line: #3B352F;
+    --push: #E07D62; --on-push: #1E0E09;
+    --pull: #86A8D6; --on-pull: #0D1724;
+    --leg: #D6A341;  --on-leg: #1C1405;
+    --rest: #9B9288; --on-rest: #171513;
+    --done: #62B886; --on-done: #0F2016; --done-soft: #1F3326;
+    --warn: #E6966B; --warn-soft: #3A291E;
+    --bad: #FF7B6E;  --on-bad: #2A0D0A;  --bad-soft: #3E201C;
     --scrim: rgba(0,0,0,.6);
-    --bar: #ECEFF1;  --on-bar: #101315;
+    --bar: #EEE9E2;  --on-bar: #171513;
     --shadow: 0 0 0 1px rgba(255,255,255,.02);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #101315; --surface: #1A1E21; --surface-2: #242A2E; --ink: #ECEFF1; --ink-2: #9AA5AC; --line: #2F373C;
-  --push: #E5584D; --on-push: #1A0B0A;
-  --pull: #5C93F0; --on-pull: #08162E;
-  --leg: #F6C62F;  --on-leg: #1A1500;
-  --rest: #8E999F; --on-rest: #101315;
-  --done: #3FBF78; --on-done: #07210F; --done-soft: #1B3527;
-  --warn: #F08A5D; --warn-soft: #3A2218;
-  --bar: #ECEFF1;  --on-bar: #101315;
+  --bg: #171513; --surface: #211E1B; --surface-2: #2C2824; --ink: #EEE9E2; --ink-2: #A99F93; --line: #3B352F;
+  --push: #E07D62; --on-push: #1E0E09;
+  --pull: #86A8D6; --on-pull: #0D1724;
+  --leg: #D6A341;  --on-leg: #1C1405;
+  --rest: #9B9288; --on-rest: #171513;
+  --done: #62B886; --on-done: #0F2016; --done-soft: #1F3326;
+  --warn: #E6966B; --warn-soft: #3A291E;
+  --bad: #FF7B6E;  --on-bad: #2A0D0A;  --bad-soft: #3E201C;
+  --scrim: rgba(0,0,0,.6);
+  --bar: #EEE9E2;  --on-bar: #171513;
   --shadow: 0 0 0 1px rgba(255,255,255,.02);
   color-scheme: dark;
 }
@@ -119,7 +119,7 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 .strip { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .strip .sl { font-size: .9rem; font-weight: 600; letter-spacing: 0; color: var(--ink); width: 100%; }
 .pill { appearance: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--line); background: var(--surface-2); border-radius: 99px; padding: 6px 12px 6px 8px; font-size: .85rem; font-weight: 600; min-height: 2.75rem; }
-.pill .bx { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; color: transparent; }
+.pill .bx { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink-2); background: var(--surface); display: grid; place-items: center; color: transparent; }
 .pill .bx svg { width: 12px; height: 12px; }
 .pill[aria-pressed="true"] { background: var(--done-soft); border-color: var(--done); }
 .pill[aria-pressed="true"] .bx { background: var(--done); border-color: var(--done); color: var(--on-done); }
@@ -127,21 +127,22 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 .pill.water b { font-variant-numeric: tabular-nums; }
 
 /* hero */
-.hero { position: relative; overflow: hidden; border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; background: var(--day); color: var(--on-day); }
+.hero { position: relative; overflow: hidden; border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--surface); color: var(--ink); }
+.hero h1::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--day); margin-right: 8px; vertical-align: 1px; }
+.hero .eyebrow, .hero .meta { color: var(--ink-2); }
 .hero[data-type="push"] { --day: var(--push); --on-day: var(--on-push); }
 .hero[data-type="pull"] { --day: var(--pull); --on-day: var(--on-pull); }
 .hero[data-type="leg"]  { --day: var(--leg);  --on-day: var(--on-leg); }
 .hero[data-type="rest"] { --day: var(--rest); --on-day: var(--on-rest); }
 .hero > * { position: relative; }
-.hero .plate { position: absolute; right: -18px; top: -18px; width: 84px; height: 84px; opacity: .2; color: var(--on-day); }
 .eyebrow { margin: 0; font-size: .85rem; font-weight: 500; }
 .hero h1 { margin: 0; font-weight: 600; font-size: 1.25rem; line-height: 1.15; text-wrap: balance; }
 .meta { margin: 0; font-size: .85rem; font-weight: 600; }
 .hero-r { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .prog { display: flex; align-items: center; gap: 10px; font-size: .85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .track { position: relative; flex: 1; height: 8px; border-radius: 99px; overflow: hidden; }
-.track::before { content: ""; position: absolute; inset: 0; background: var(--on-day); opacity: .28; }
-.fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--on-day); border-radius: 99px; transition: width .25s; }
+.track::before { content: ""; position: absolute; inset: 0; background: var(--surface-2); }
+.fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--day); border-radius: 99px; transition: width .25s; }
 
 /* coach tip */
 .tip { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 4px; }
@@ -184,7 +185,7 @@ button:focus-visible, summary:focus-visible, select:focus-visible { outline: 2px
 .fld input::placeholder { color: var(--ink-2); opacity: 1; font-weight: 500; }
 .fld input.auto { font-style: italic; color: var(--ink-2); text-decoration: underline dotted; text-underline-offset: 4px; }
 .fld input:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
-.chk { appearance: none; width: 3.2rem; height: 3.2rem; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); color: var(--line); display: grid; place-items: center; cursor: pointer; padding: 0; flex: none; }
+.chk { appearance: none; width: 3.2rem; height: 3.2rem; border-radius: 50%; border: 2px solid var(--ink-2); background: var(--surface); color: var(--line); display: grid; place-items: center; cursor: pointer; padding: 0; flex: none; }
 .chk svg { width: 1.4rem; height: 1.4rem; }
 .set.done .chk, .chk[aria-pressed="true"] { background: var(--done); border-color: var(--done); color: var(--on-done); }
 .hint { margin: 0; font-size: .85rem; font-weight: 600; background: var(--done-soft); border-radius: 10px; padding: 8px 10px; }
@@ -371,7 +372,7 @@ details.how[open] summary::after { content: "–"; }
 .fld input[aria-invalid="true"], .tin[aria-invalid="true"] { border-color: var(--bad); box-shadow: 0 0 0 1.5px var(--bad); background: var(--bad-soft); }
 .flash { animation: flash 1.2s ease-out; }
 @keyframes flash { 0%, 60% { border-color: var(--bad); box-shadow: 0 0 0 2.5px var(--bad); background: var(--bad-soft); } }
-.toast.bad { background: var(--bad); color: #fff; }
+.toast.bad { background: var(--bad); color: var(--on-bad); }
 
 /* modal sheet: confirm dialog and history detail */
 .sheet { position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: flex; align-items: flex-end; justify-content: center;
@@ -453,7 +454,6 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
   var DAY_NAMES = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
   var MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
   var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
-  var PLATE = '<svg class="plate" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="currentColor"/><circle cx="50" cy="50" r="38" fill="none" stroke="var(--day)" stroke-width="3"/><circle cx="50" cy="50" r="19" fill="none" stroke="var(--day)" stroke-width="2"/><circle cx="50" cy="50" r="11" fill="var(--day)"/></svg>';
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -1422,7 +1422,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     if (editKey && log[editKey] === doc) {
       h += '<div class="editbar"><span>Geçmiş kaydı düzenliyorsun · ' + shortDate(doc.date) + '</span><button type="button" class="mini" data-act="edit-exit">Bugüne dön</button></div>';
     }
-    h += '<section class="hero" data-type="' + day.type + '">' + PLATE + '<p class="eyebrow">' + eyebrow + '</p><h1>' + titleCase(day.title) + '</h1>';
+    h += '<section class="hero" data-type="' + day.type + '"><p class="eyebrow">' + eyebrow + '</p><h1>' + titleCase(day.title) + '</h1>';
     if (day.type === 'rest') {
       h += '<p class="meta">' + day.meta + '</p></section>';
       var done = doc.cardio.d;
