@@ -84,3 +84,17 @@ Uygulamada olan kurallar (bozma):
 Yeni görevler buraya eklenir, biten görev işaretlenir.
 
 - [x] GÖREV 1: Faz 1'in tamamı. (Yayın: https://ahmet23emir-collab.github.io/antrenman-defteri/)
+- [x] GÖREV 2: Hata düzeltme (QA raporu). Veri modeli ve geriye uyumluluk kuralları aynen geçerli.
+  - Önemli (veri hataları):
+    1. Set tamamlama doğrulaması: tekrar boş veya 0 ise set işaretlenmez; tekrar alanı kısa süre kırmızı çerçeve alır, "Tekrar sayısını yaz" uyarısı çıkar. Kilo boş olabilir (vücut ağırlığı hareketleri, boş = 0 ek kilo); doluysa geçerli sayı olmalı. Mevcut kayıtlara dokunulmaz, sadece yeni giriş doğrulanır.
+    2. Kilo ve tekrar alanlarında harf girişi engellenir: `inputmode="decimal"`, virgül ve nokta kabul (42,5), harf ve eksi işareti girerken filtrelenir. Geçersiz değer sessizce silinmez; alan kırmızı olur ve kısa uyarı çıkar.
+    3. Vücut sekmesi: boy, kilo, yaş değiştikçe protein/kalori hedefleri ve grafik anında güncellenir (input olayı, 300 ms gecikme).
+  - Küçük:
+    4. "Antrenmanı bitir": tamamlanmamış set varsa onay sorar ("14 setten 3'ü yapıldı. Yine de bitirelim mi?" [Devam et] [Bitir]); hepsi yapıldıysa sormadan biter.
+    5. Antrenman bitince dinlenme sayacı durur ve kapanır.
+    6. Takviye eklerken ad boşsa görünür uyarı çıkar.
+    7. Geçmiş: takvimde güne veya seans kartına basınca antrenman detayı açılır (hareketler, set başına kilo × tekrar, not). Salt okunur; "Düzenle" ile kayıt ekranına geçilir. Şema değişmez.
+    8. Haftalık kas çubukları kas grubuna göre renklenir: itiş, çekiş, bacak ayrı; renkler `:root` token'larından, iki temada okunur.
+  - Yedek indirme:
+    9. "Yedeği indir": `navigator.canShare({files})` destekleniyorsa paylaşım menüsü açılır, yoksa Blob + `<a download>`. İçerik formatı aynı: `{ app: 'antrenman-defteri', v: 2, exported, workouts, daily, profile }`.
+  - Bitirince: `sw.js` VERSION artır; boş test tarayıcısında 400 px'te 1, 2, 3, 4, 5, 7'yi dene; commit + push.

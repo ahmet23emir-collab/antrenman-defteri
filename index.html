@@ -42,6 +42,8 @@ img { max-width: 100%; }
   --rest: #66727A;  --on-rest: #FFFFFF;
   --done: #1B8A4B;  --on-done: #FFFFFF;  --done-soft: #DCF1E4;
   --warn: #B4471B;  --warn-soft: #FBE7DC;
+  --bad: #C0262D;   --bad-soft: #FDE4E4;
+  --scrim: rgba(20,24,27,.45);
   --bar: #14181B;   --on-bar: #F1F3F4;
   --shadow: 0 1px 0 rgba(20,24,27,.04), 0 8px 20px -12px rgba(20,24,27,.3);
 }
@@ -54,6 +56,10 @@ img { max-width: 100%; }
     --rest: #8E999F; --on-rest: #101315;
     --done: #3FBF78; --on-done: #07210F; --done-soft: #1B3527;
     --warn: #F08A5D; --warn-soft: #3A2218;
+  --bad: #FF6B6B;  --bad-soft: #3D1A1C;
+  --scrim: rgba(0,0,0,.6);
+    --bad: #FF6B6B;  --bad-soft: #3D1A1C;
+    --scrim: rgba(0,0,0,.6);
     --bar: #ECEFF1;  --on-bar: #101315;
     --shadow: 0 0 0 1px rgba(255,255,255,.02);
     color-scheme: dark;
@@ -363,7 +369,34 @@ details.how[open] summary::after { content: "–"; }
 .addf.five { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .addf.five .tin { padding: 0 .5rem; }
 
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* invalid input: red frame; .flash adds a short pulse */
+.fld input[aria-invalid="true"], .tin[aria-invalid="true"] { border-color: var(--bad); box-shadow: 0 0 0 1.5px var(--bad); background: var(--bad-soft); }
+.flash { animation: flash 1.2s ease-out; }
+@keyframes flash { 0%, 60% { border-color: var(--bad); box-shadow: 0 0 0 2.5px var(--bad); background: var(--bad-soft); } }
+.toast.bad { background: var(--bad); color: #fff; }
+
+/* modal sheet: confirm dialog and history detail */
+.sheet { position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: flex; align-items: flex-end; justify-content: center;
+  padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.sheet-in { width: 100%; max-width: 34rem; max-height: calc(100dvh - 32px - env(safe-area-inset-top, 0px)); overflow: auto; overscroll-behavior: contain; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: grid; gap: 12px; box-shadow: 0 20px 40px -12px rgba(0,0,0,.5); }
+.sheet-in h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; line-height: 1; letter-spacing: .02em; }
+.sheet-in .muted { margin-top: -6px; }
+.sheet-msg { margin: 0; font-size: 1rem; line-height: 1.45; }
+.sheet-act { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.sheet-act .btn { min-height: 3rem; }
+.dx { display: grid; gap: 4px; padding-top: 10px; border-top: 1px solid var(--line); }
+.dx b { font-weight: 700; font-size: .95rem; }
+.dx ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; font-size: .9rem; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.dx ol li span { display: inline-block; min-width: 1.6rem; color: var(--ink); font-weight: 600; }
+.dx .skip { font-size: .85rem; color: var(--ink-2); }
+button.sess { appearance: none; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+button.sess .pl { width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at center, var(--surface) 0 2.5px, var(--c) 3px); }
+button.cd { appearance: none; border: 0; font: inherit; color: inherit; cursor: pointer; }
+button.cd:focus-visible, button.sess:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.editbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--warn-soft); border: 1px solid var(--warn); border-radius: 12px; padding: 10px 12px; font-size: .88rem; font-weight: 600; }
+.editbar .mini { color: var(--ink); border-color: var(--ink-2); flex: none; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
 <body>
@@ -786,6 +819,7 @@ details.how[open] summary::after { content: "–"; }
     return best;
   }
   function findDoc(sid) {
+    if (editKey && log[editKey] && log[editKey].s === sid) { return log[editKey]; }
     var best = latestInWeek(sid);
     if (best) { return best; }
     var key = keyOf(today, sid);
@@ -997,6 +1031,7 @@ details.how[open] summary::after { content: "–"; }
   var progKey = ALL_EX[0].key;
   var needsRender = false;
   var vd = today; /* the day shown on the Beslenme and Takviye tabs */
+  var editKey = null; /* a past session opened from Geçmiş for editing */
   function dayNav(right) {
     var lab = vd === today ? 'Bugün' : (vd === addDays(today, -1) ? 'Dün' : shortDate(vd));
     return '<div class="dnav"><button type="button" class="mini" data-act="day" data-d="-1" aria-label="Önceki gün">‹</button>' +
@@ -1007,11 +1042,83 @@ details.how[open] summary::after { content: "–"; }
   function editing() { var a = document.activeElement; return !!(a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT')); }
 
   var toastEl = document.getElementById('toast'), toastT = null;
-  function toast(msg) {
+  function toast(msg, bad) {
     toastEl.textContent = msg;
+    toastEl.classList.toggle('bad', !!bad);
     toastEl.hidden = false;
     clearTimeout(toastT);
     toastT = setTimeout(function () { toastEl.hidden = true; }, 3500);
+  }
+
+  /* ================= number fields ================= */
+  /* a complete number: 42, 42,5, 42.5, ",5"; a trailing separator ("42,") is fine while typing */
+  var NUM_OK = /^(\d+([.,]\d*)?|[.,]\d+)$/;
+  function numOk(v) { v = String(v).trim(); return v === '' || NUM_OK.test(v); }
+  function flagInput(inp, on) {
+    if (!inp) { return; }
+    if (on) {
+      inp.setAttribute('aria-invalid', 'true');
+      inp.classList.remove('flash'); void inp.offsetWidth; inp.classList.add('flash');
+    } else {
+      inp.removeAttribute('aria-invalid');
+    }
+  }
+  /* letters, minus and other symbols never reach the stored value; a malformed number stays visible in red */
+  function cleanNum(t) {
+    var raw = t.value, v = raw.replace(/[^\d.,]/g, '');
+    if (v !== raw) {
+      var pos = (t.selectionStart || v.length) - (raw.length - v.length);
+      t.value = v;
+      try { t.setSelectionRange(Math.max(0, pos), Math.max(0, pos)); } catch (e) {}
+      t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
+      toast('Sadece sayı yaz. Ondalık için virgül kullan.', true);
+    }
+    if (numOk(v)) { flagInput(t, false); return true; }
+    if (t.getAttribute('aria-invalid') !== 'true') { toast('Bu sayı geçersiz: ' + v, true); }
+    flagInput(t, true);
+    return false;
+  }
+
+  /* ================= sheet: confirm dialog and detail view ================= */
+  var sheetEl = null, sheetBack = null;
+  function closeSheet() {
+    if (!sheetEl) { return; }
+    sheetEl.remove(); sheetEl = null;
+    document.removeEventListener('keydown', sheetKey);
+    if (sheetBack && sheetBack.focus) { try { sheetBack.focus(); } catch (e) {} }
+    sheetBack = null;
+  }
+  function sheetKey(ev) { if (ev.key === 'Escape') { closeSheet(); } }
+  /* html: sheet body; acts: { name: fn } for buttons inside it carrying data-sheet="name" */
+  function openSheet(html, label, acts) {
+    closeSheet();
+    sheetBack = document.activeElement;
+    sheetEl = document.createElement('div');
+    sheetEl.className = 'sheet';
+    sheetEl.innerHTML = '<div class="sheet-in" role="dialog" aria-modal="true" aria-label="' + esc(label) + '">' + html + '</div>';
+    sheetEl.addEventListener('click', function (ev) {
+      if (ev.target === sheetEl) { closeSheet(); return; }
+      var b = ev.target.closest('[data-sheet]');
+      if (!b) { return; }
+      var fn = acts && acts[b.getAttribute('data-sheet')];
+      closeSheet();
+      if (fn) { fn(b); }
+    });
+    document.body.appendChild(sheetEl);
+    document.addEventListener('keydown', sheetKey);
+    var first = sheetEl.querySelector('button');
+    if (first) { first.focus(); }
+  }
+  function confirmSheet(msg, cancelLabel, okLabel, onOk) {
+    openSheet('<p class="sheet-msg">' + msg + '</p><div class="sheet-act"><button type="button" class="btn ghost" data-sheet="no">' + cancelLabel + '</button><button type="button" class="btn" data-sheet="ok">' + okLabel + '</button></div>',
+      'Onay', { ok: onOk });
+  }
+  /* Turkish possessive after a numeral: 3'ü, 6'sı, 10'u */
+  function possSuffix(n) {
+    var U = ['', 'i', 'si', 'ü', 'ü', 'i', 'sı', 'si', 'i', 'u'], T = ['', 'u', 'si', 'u', 'ı', 'si', 'ı', 'i', 'i', 'ı'];
+    if (n % 10) { return U[n % 10]; }
+    if (n % 100) { return T[(n % 100) / 10]; }
+    return n ? 'ü' : 'ı';
   }
 
   /* ================= chart ================= */
@@ -1154,7 +1261,7 @@ details.how[open] summary::after { content: "–"; }
         var who = (e.parts.length > 1 ? pn + ', ' : '') + 'set ' + (j + 1);
         h += '<div class="part">' + (e.parts.length > 1 ? '<span class="plabel">' + pn + '</span>' : '') +
           '<label class="fld"><input class="in" id="in-' + e.id + '-' + j + '-' + p + '-w" data-k="w" data-p="' + p + '" type="text" inputmode="decimal" autocomplete="off" aria-label="' + who + ' ' + (e.bw ? 'ek kilo' : 'kilo') + '" placeholder="' + (lw !== null ? fmt(lw) : '–') + '" data-ph="' + (lw !== null ? fmt(lw) : '') + '" value="' + fmt(s.w[p]) + '"><span>' + (e.bw ? '+kg' : 'kg') + '</span></label>' +
-          '<label class="fld"><input class="in" id="in-' + e.id + '-' + j + '-' + p + '-r" data-k="r" data-p="' + p + '" type="text" inputmode="numeric" autocomplete="off" aria-label="' + who + ' tekrar" placeholder="' + (lr !== null ? fmt(lr) : (e.reps ? e.reps[0] + '–' + e.reps[1] : '–')) + '" data-ph="' + (lr !== null ? fmt(lr) : '') + '" value="' + fmt(s.r[p]) + '"><span>tekrar</span></label></div>';
+          '<label class="fld"><input class="in" id="in-' + e.id + '-' + j + '-' + p + '-r" data-k="r" data-p="' + p + '" type="text" inputmode="decimal" autocomplete="off" aria-label="' + who + ' tekrar" placeholder="' + (lr !== null ? fmt(lr) : (e.reps ? e.reps[0] + '–' + e.reps[1] : '–')) + '" data-ph="' + (lr !== null ? fmt(lr) : '') + '" value="' + fmt(s.r[p]) + '"><span>tekrar</span></label></div>';
       });
       h += '</div><button type="button" class="chk" aria-pressed="' + !!s.d + '" aria-label="Set ' + (j + 1) + ' tamamlandı">' + CHECK + '</button></div>';
       h += '<div class="fb" data-j="' + j + '" role="status" hidden></div>';
@@ -1247,7 +1354,11 @@ details.how[open] summary::after { content: "–"; }
     cur = findDoc(day.sid);
     var doc = cur;
     var eyebrow = longDate(doc.date) + (doc.date === today ? ' · bugün' : '');
-    var h = '<section class="hero" data-type="' + day.type + '">' + PLATE + '<p class="eyebrow">' + eyebrow + '</p><h1>' + day.title + '</h1>';
+    var h = '';
+    if (editKey && log[editKey] === doc) {
+      h += '<div class="editbar"><span>Geçmiş kaydı düzenliyorsun · ' + shortDate(doc.date) + '</span><button type="button" class="mini" data-act="edit-exit">Bugüne dön</button></div>';
+    }
+    h += '<section class="hero" data-type="' + day.type + '">' + PLATE + '<p class="eyebrow">' + eyebrow + '</p><h1>' + day.title + '</h1>';
     if (day.type === 'rest') {
       h += '<p class="meta">' + day.meta + '</p></section>';
       var done = doc.cardio.d;
@@ -1470,6 +1581,18 @@ details.how[open] summary::after { content: "–"; }
       '<p class="muted">Sabah tuvaletten sonra, aç karnına tartıl. Günlük oynama normal; haftalık ortalamaya bak.</p>' +
       '<div class="row2"><label class="fld"><input id="sleep-in" type="text" inputmode="decimal" autocomplete="off" aria-label="Dün gece uyku, saat" placeholder="Uyku" value="' + fmt(dd && dd.sleep) + '"><span>saat</span></label>' +
       '<label class="fld"><input id="steps-in" type="text" inputmode="numeric" autocomplete="off" aria-label="Bugünkü adım" placeholder="Adım" value="' + (dd && dd.steps ? dd.steps : '') + '"><span>adım</span></label></div>';
+    h += '<div id="body-avg">' + bodyAvgHTML() + '</div></section><div id="body-trend" style="display:grid;gap:inherit">' + bodyTrendHTML() + '</div>';
+    h += '<section class="card"><span class="lbl">Hedefler</span><div id="body-goals">' + bodyGoalsHTML() + '</div>' +
+      '<div class="row2"><label class="fld"><input id="h-in" type="text" inputmode="numeric" autocomplete="off" aria-label="Boy" placeholder="Boy" value="' + fmt(profile.h) + '"><span>cm</span></label>' +
+      '<label class="fld"><input id="age-in" type="text" inputmode="numeric" autocomplete="off" aria-label="Yaş" placeholder="Yaş" value="' + fmt(profile.age) + '"><span>yaş</span></label></div>' +
+      '<label class="lbl" for="sex">Kalori hesabı için</label><select class="sel" id="sex"><option value="e"' + (profile.sex === 'e' ? ' selected' : '') + '>Erkek</option><option value="k"' + (profile.sex === 'k' ? ' selected' : '') + '>Kadın</option></select>' +
+      '<p class="muted" id="body-kmsg">' + bodyKmsgHTML() + '</p>' +
+      '<label class="lbl" for="protk">Protein katsayısı</label><select class="sel" id="protk">' +
+      [1.6, 1.8, 2, 2.2].map(function (k) { return '<option value="' + k + '"' + (profile.protK === k ? ' selected' : '') + '>' + fmt(k) + ' g / kg' + (k === 1.6 ? ' · koruma' : k === 1.8 ? ' · önerilen' : k === 2.2 ? ' · yağ yakarken' : '') + '</option>'; }).join('') +
+      '</select></section>';
+    view.innerHTML = h;
+  }
+  function bodyAvgHTML() {
     var sl = [], stp = [];
     for (var di = 0; di < 7; di++) {
       var dx = daily[addDays(today, -di)];
@@ -1478,13 +1601,13 @@ details.how[open] summary::after { content: "–"; }
     }
     if (sl.length || stp.length) {
       var slA = sl.length ? sl.reduce(function (a, b) { return a + b; }, 0) / sl.length : null;
-      h += '<p class="muted">7 gün ortalaması: ' + (slA ? fmt1(slA) + ' saat uyku' + (slA < 7 ? ' (kas gelişimi için 7–9 saat hedefle)' : '') : '') + (slA && stp.length ? ' · ' : '') +
+      return '<p class="muted">7 gün ortalaması: ' + (slA ? fmt1(slA) + ' saat uyku' + (slA < 7 ? ' (kas gelişimi için 7–9 saat hedefle)' : '') : '') + (slA && stp.length ? ' · ' : '') +
         (stp.length ? Math.round(stp.reduce(function (a, b) { return a + b; }, 0) / stp.length).toLocaleString('tr-TR') + ' adım' : '') + '.</p>';
-    } else {
-      h += '<p class="muted">Uyku 7–9 saat, günlük 7.000–10.000 adım toparlanmayı ve yağ oranını en çok etkileyen iki alışkanlık.</p>';
     }
-    h += '</section>' + trendTip();
-
+    return '<p class="muted">Uyku 7–9 saat, günlük 7.000–10.000 adım toparlanmayı ve yağ oranını en çok etkileyen iki alışkanlık.</p>';
+  }
+  function bodyTrendHTML() {
+    var series = bwSeries(), h = trendTip();
     if (series.length) {
       var last = series[series.length - 1];
       var wk = series.filter(function (p) { return dayDiff(today, p.x) < 7; });
@@ -1502,30 +1625,81 @@ details.how[open] summary::after { content: "–"; }
 
     var ws = Object.keys(daily).sort().filter(function (k) { return daily[k].waist; }).map(function (k) { return { x: k, y: daily[k].waist }; });
     if (ws.length > 1) { h += '<section class="card"><span class="lbl">Bel çevresi (cm)</span>' + lineChart(ws.slice(-90), 'cm', 'leg') + '</section>'; }
-
-    var bw = latestBw();
-    h += '<section class="card"><span class="lbl">Hedefler</span>' +
-      '<div class="sum-grid"><div><b>' + (bw ? Math.round(bw * profile.protK) : '–') + '</b><span>g protein/gün</span></div>' +
+    return h;
+  }
+  function bodyGoalsHTML() {
+    var bw = latestBw(), kg = kcalGoal();
+    return '<div class="sum-grid"><div><b>' + (bw ? Math.round(bw * profile.protK) : '–') + '</b><span>g protein/gün</span></div>' +
       '<div><b>' + liters(waterGoal()) + '</b><span>L su/gün</span></div>' +
-      '<div><b>' + (kcalGoal() ? kcalGoal().toLocaleString('tr-TR') : '–') + '</b><span>kcal/gün</span></div></div>' +
-      '<div class="row2"><label class="fld"><input id="h-in" type="text" inputmode="numeric" autocomplete="off" aria-label="Boy" placeholder="Boy" value="' + fmt(profile.h) + '"><span>cm</span></label>' +
-      '<label class="fld"><input id="age-in" type="text" inputmode="numeric" autocomplete="off" aria-label="Yaş" placeholder="Yaş" value="' + fmt(profile.age) + '"><span>yaş</span></label></div>' +
-      '<label class="lbl" for="sex">Kalori hesabı için</label><select class="sel" id="sex"><option value="e"' + (profile.sex === 'e' ? ' selected' : '') + '>Erkek</option><option value="k"' + (profile.sex === 'k' ? ' selected' : '') + '>Kadın</option></select>' +
-      '<p class="muted">' + (profile.h && profile.age ? 'Kalori hedefi boy, kilo ve yaşına göre hesaplanıyor (haftada 5 antrenman).' : 'Boy ve yaşını yazarsan kalori hedefi sana göre hesaplanır; yazmazsan kilona göre kaba bir tahmin kullanılır.') +
-      (profile.kadj ? ' Gidişata göre ' + (profile.kadj > 0 ? '+' : '') + profile.kadj + ' kcal ayar uygulandı. <button type="button" class="mini" data-act="kadj-reset">Ayarı sıfırla</button>' : '') + '</p>' +
-      '<label class="lbl" for="protk">Protein katsayısı</label><select class="sel" id="protk">' +
-      [1.6, 1.8, 2, 2.2].map(function (k) { return '<option value="' + k + '"' + (profile.protK === k ? ' selected' : '') + '>' + fmt(k) + ' g / kg' + (k === 1.6 ? ' · koruma' : k === 1.8 ? ' · önerilen' : k === 2.2 ? ' · yağ yakarken' : '') + '</option>'; }).join('') +
-      '</select></section>';
-    view.innerHTML = h;
+      '<div><b>' + (kg ? kg.toLocaleString('tr-TR') : '–') + '</b><span>kcal/gün</span></div></div>';
+  }
+  function bodyKmsgHTML() {
+    return (profile.h && profile.age ? 'Kalori hedefi boy, kilo ve yaşına göre hesaplanıyor (haftada 5 antrenman).' : 'Boy ve yaşını yazarsan kalori hedefi sana göre hesaplanır; yazmazsan kilona göre kaba bir tahmin kullanılır.') +
+      (profile.kadj ? ' Gidişata göre ' + (profile.kadj > 0 ? '+' : '') + profile.kadj + ' kcal ayar uygulandı. <button type="button" class="mini" data-act="kadj-reset">Ayarı sıfırla</button>' : '');
+  }
+  /* Vücut tab: refresh targets and charts while typing, without touching the input fields */
+  var bodyT = null;
+  function scheduleBody() {
+    clearTimeout(bodyT);
+    bodyT = setTimeout(function () {
+      if (tab !== 'vucut') { return; }
+      var parts = { 'body-avg': bodyAvgHTML, 'body-trend': bodyTrendHTML, 'body-goals': bodyGoalsHTML, 'body-kmsg': bodyKmsgHTML };
+      Object.keys(parts).forEach(function (id) { var el = document.getElementById(id); if (el) { el.innerHTML = parts[id](); } });
+    }, 300);
   }
 
   /* ================= tab: geçmiş ================= */
-  function renderHistory() {
-    var docs = liveDocs().filter(function (d) {
+  function histDocs() {
+    return liveDocs().filter(function (d) {
       var i = idxOfSid(d.s);
       if (i < 0) { return false; }
       return PROGRAM[i].type === 'rest' ? d.cardio.d : doneCount(d, PROGRAM[i]) > 0;
     }).sort(function (a, b) { return a.date < b.date ? 1 : (a.date > b.date ? -1 : b.u - a.u); });
+  }
+  /* read-only view of one or more sessions; "Düzenle" opens the record in the Antrenman tab */
+  function detailHTML(d) {
+    var day = PROGRAM[idxOfSid(d.s)], key = keyOf(d.date, d.s);
+    var h = '<h2>' + day.title + '</h2><p class="muted">' + longDate(d.date) + (d.fin || day.type === 'rest' ? '' : ' · yarım kaldı') + '</p>';
+    if (day.type === 'rest') {
+      h += '<div class="dx"><b>Kardiyo</b><span class="skip">' + (d.cardio.m ? fmt(d.cardio.m) + ' dakika' : 'Süre yazılmadı') + '</span></div>';
+    } else {
+      var st = docStats(d, day);
+      h += '<p class="muted">' + st.sets + ' set · ' + Math.round(st.vol).toLocaleString('tr-TR') + ' kg hacim' + (st.dur ? ' · ' + st.dur + ' dk' : '') + '</p>';
+      day.ex.forEach(function (e) {
+        var list = setsOf(d, e);
+        if (!list.some(function (s) { return s.d; })) { return; }
+        h += '<div class="dx"><b>' + e.name + '</b><ol>';
+        list.forEach(function (s, j) {
+          if (!s.d) { return; }
+          var txt = e.parts.map(function (pn, p) {
+            var w = s.w[p], r = s.r[p];
+            var left = w ? (e.bw ? '+' : '') + fmt(w) + ' kg × ' : (e.bw ? 'Vücut ağırlığı × ' : '');
+            return (e.parts.length > 1 ? pn.split(' ')[0] + ' ' : '') + left + (r !== null && r !== undefined ? fmt(r) : '–');
+          }).join('  |  ');
+          h += '<li><span>' + (j + 1) + '.</span> ' + txt + '</li>';
+        });
+        h += '</ol></div>';
+      });
+    }
+    if (d.note) { h += '<div class="dx"><b>Not</b><span class="skip">' + esc(d.note) + '</span></div>'; }
+    h += '<div class="sheet-act"><button type="button" class="btn ghost" data-sheet="close">Kapat</button><button type="button" class="btn" data-sheet="edit" data-k="' + esc(key) + '">Düzenle</button></div>';
+    return h;
+  }
+  function showDetail(keys) {
+    keys = keys.filter(function (k) { return log[k]; });
+    if (!keys.length) { return; }
+    openSheet(keys.map(function (k) { return detailHTML(log[k]); }).join('<hr style="border:0;border-top:2px solid var(--line);margin:4px 0;width:100%">'), 'Antrenman detayı', {
+      edit: function (b) {
+        var k = b.getAttribute('data-k'), d = log[k];
+        if (!d) { return; }
+        editKey = k; sel = idxOfSid(d.s);
+        goTab('antrenman', true);
+      }
+    });
+  }
+
+  function renderHistory() {
+    var docs = histDocs();
 
     var lifts = docs.filter(function (d) { return PROGRAM[idxOfSid(d.s)].type !== 'rest'; });
     var last30 = lifts.filter(function (d) { return dayDiff(today, d.date) < 30; });
@@ -1543,13 +1717,15 @@ details.how[open] summary::after { content: "–"; }
       '<div><b>' + weeks + '</b><span>hafta üst üste</span></div></section>';
 
     /* last five weeks at a glance */
-    var cal = '<div class="cal" role="img" aria-label="Son beş haftanın antrenman takvimi">' + ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pa'].map(function (x) { return '<span class="ch">' + x + '</span>'; }).join('');
+    var cal = '<div class="cal" aria-label="Son beş haftanın antrenman takvimi">' + ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pa'].map(function (x) { return '<span class="ch">' + x + '</span>'; }).join('');
     for (var ci = 0; ci < 35; ci++) {
       var cd = addDays(weekStart, ci - 28);
       var dots = docs.filter(function (d) { return d.date === cd; }).map(function (d) { return '<i style="--c:var(--' + PROGRAM[idxOfSid(d.s)].type + ')"></i>'; }).join('');
-      cal += '<span class="cd' + (cd === today ? ' now' : '') + (cd > today ? ' fut' : '') + '"><b>' + parseYmd(cd).getDate() + '</b><span>' + dots + '</span></span>';
+      cal += dots
+        ? '<button type="button" class="cd' + (cd === today ? ' now' : '') + '" data-act="hist-day" data-d="' + cd + '" aria-label="' + longDate(cd) + ' antrenmanını aç"><b>' + parseYmd(cd).getDate() + '</b><span>' + dots + '</span></button>'
+        : '<span class="cd' + (cd === today ? ' now' : '') + (cd > today ? ' fut' : '') + '"><b>' + parseYmd(cd).getDate() + '</b><span></span></span>';
     }
-    h += '<section class="card"><span class="lbl">Son 5 hafta</span>' + cal + '</div>' +
+    h += '<section class="card"><span class="lbl">Son 5 hafta · ayrıntı için güne dokun</span>' + cal + '</div>' +
       '<p class="legend"><i style="--c:var(--push)"></i>İtiş<i style="--c:var(--pull)"></i>Çekiş<i style="--c:var(--leg)"></i>Bacak<i style="--c:var(--rest)"></i>Kardiyo</p></section>';
 
     /* weekly sets per muscle: done so far against what the program plans */
@@ -1563,11 +1739,14 @@ details.how[open] summary::after { content: "–"; }
         (MUS[e.id] || []).forEach(function (m) { doneM[m[0]] += n * m[1]; });
       });
     });
+    /* bar colour by muscle group: push, pull, legs; core grey. A check marks a muscle that reached its weekly plan. */
+    var MUS_GROUP = ['push', 'pull', 'push', 'pull', 'push', 'leg', 'leg', 'leg', 'rest'];
     h += '<section class="card macro"><span class="lbl">Bu hafta kas başına set (yapılan / programdaki)</span>' +
       MUS_NAMES.map(function (nm, i) {
         var pct = planM[i] ? Math.min(100, Math.round(doneM[i] / planM[i] * 100)) : 0;
-        return '<div class="mrow" style="--c:var(--' + (pct >= 100 ? 'done' : 'pull') + ')"><span>' + nm + '</span><div class="bar2"><i style="width:' + pct + '%"></i></div><em>' + fmt(Math.round(doneM[i] * 2) / 2) + ' / ' + fmt(Math.round(planM[i] * 2) / 2) + '</em></div>';
+        return '<div class="mrow" style="--c:var(--' + (MUS_GROUP[i] || 'rest') + ')"><span>' + nm + '</span><div class="bar2"><i style="width:' + pct + '%"></i></div><em>' + (pct >= 100 ? '<b style="color:var(--done)">✓</b> ' : '') + fmt(Math.round(doneM[i] * 2) / 2) + ' / ' + fmt(Math.round(planM[i] * 2) / 2) + '</em></div>';
       }).join('') +
+      '<p class="legend"><i style="--c:var(--push)"></i>İtiş<i style="--c:var(--pull)"></i>Çekiş<i style="--c:var(--leg)"></i>Bacak<i style="--c:var(--rest)"></i>Karın</p>' +
       '<p class="muted">Yardımcı çalışan kas yarım set sayılır (ör. row’da biceps). Kas gelişimi için haftada kas başına kabaca 10–20 set hedeflenir; tükenişe yakın çalıştığın için alt sınıra yakın olman normal.</p></section>';
 
     /* progress per exercise */
@@ -1605,20 +1784,14 @@ details.how[open] summary::after { content: "–"; }
     if (!docs.length) { h += '<p class="empty">Henüz kayıtlı antrenman yok. Antrenman sekmesinde ilk setini işaretle.</p>'; }
     docs.slice(0, 30).forEach(function (d) {
       var day = PROGRAM[idxOfSid(d.s)];
-      var right, body = '';
+      var right;
       if (day.type === 'rest') {
         right = d.cardio.m ? fmt(d.cardio.m) + ' dk' : 'yapıldı';
-        body = '<p><span>Kardiyo' + (d.cardio.m ? ', ' + fmt(d.cardio.m) + ' dakika' : '') + '</span></p>';
       } else {
         var st = docStats(d, day);
         right = st.sets + ' set<br>' + Math.round(st.vol).toLocaleString('tr-TR') + ' kg' + (st.dur ? '<br>' + st.dur + ' dk' : '');
-        day.ex.forEach(function (e) {
-          var list = setsOf(d, e).filter(function (s) { return s.d; });
-          if (list.length) { body += '<p><b>' + e.name + '</b><span>' + setsLine(e, list) + '</span></p>'; }
-        });
-        if (d.note) { body += '<p><b>Not</b><span>' + esc(d.note) + '</span></p>'; }
       }
-      h += '<details class="sess"><summary><span class="pl" style="--c:var(--' + day.type + ')"></span><span class="ss-t"><b>' + day.title + '</b><span>' + longDate(d.date) + (d.fin || day.type === 'rest' ? '' : ' · yarım') + '</span></span><span class="ss-r">' + right + '</span></summary><div class="ss-d">' + body + '</div></details>';
+      h += '<button type="button" class="sess" data-act="hist" data-k="' + esc(keyOf(d.date, d.s)) + '"><span class="pl" style="--c:var(--' + day.type + ')"></span><span class="ss-t"><b>' + day.title + '</b><span>' + longDate(d.date) + (d.fin || day.type === 'rest' ? '' : ' · yarım') + '</span></span><span class="ss-r">' + right + '</span></button>';
     });
 
     /* backup */
@@ -1650,6 +1823,8 @@ details.how[open] summary::after { content: "–"; }
   function goTab(t, push) {
     if (TABS.indexOf(t) < 0) { t = 'antrenman'; }
     tab = t; vd = today; pickMeal = null;
+    if (t !== 'antrenman') { editKey = null; }
+    closeSheet();
     if (push) { try { history.replaceState(null, '', '#' + t); } catch (e) { try { location.hash = t; } catch (e2) {} } }
     render();
     window.scrollTo(0, 0);
@@ -1671,6 +1846,9 @@ details.how[open] summary::after { content: "–"; }
 
   view.addEventListener('input', function (ev) {
     var t = ev.target;
+    if (t.id === 'sf-name' || t.id === 'cf-name') { flagInput(t, false); return; }
+    var im = t.tagName === 'INPUT' ? t.getAttribute('inputmode') : null;
+    if ((im === 'decimal' || im === 'numeric') && !cleanNum(t)) { return; }
     if (t.id === 'cardio-min') { cur.cardio.m = num(t.value); touch(cur); renderWeek(); return; }
     if (t.id === 'sess-note') { cur.note = t.value.slice(0, 200); touch(cur); return; }
     if (t.classList.contains('note-in')) {
@@ -1679,20 +1857,20 @@ details.how[open] summary::after { content: "–"; }
       touchProfile(); return;
     }
     if (t.id === 'sleep-in' || t.id === 'steps-in') {
-      var sd = dayDoc(today), sv = num(t.value);
+      var sd = dayDoc(today), sv = num(t.id === 'steps-in' ? t.value.replace(/[.,]/g, '') : t.value);
       if (t.id === 'sleep-in') { sd.sleep = sv && sv <= 16 ? sv : null; } else { sd.steps = sv ? Math.round(sv) : null; }
-      touchDaily(today); needsRender = true; return;
+      touchDaily(today); scheduleBody(); return;
     }
     if (t.id === 'h-in' || t.id === 'age-in') {
       var pv = num(t.value);
       if (t.id === 'h-in') { profile.h = pv && pv >= 120 && pv <= 230 ? pv : null; } else { profile.age = pv && pv >= 12 && pv <= 90 ? Math.round(pv) : null; }
-      touchProfile(); needsRender = true; return;
+      touchProfile(); scheduleBody(); return;
     }
     if (t.id === 'food-q') { pickQ = t.value; var pl = document.getElementById('pick-list'); if (pl) { pl.innerHTML = pickListHTML(); } return; }
     if (t.id === 'bw-in' || t.id === 'waist-in') {
       var dd = dayDoc(today), v = num(t.value);
       if (t.id === 'bw-in') { dd.bw = v && v >= 30 && v <= 300 ? v : null; } else { dd.waist = v && v >= 40 && v <= 200 ? v : null; }
-      touchDaily(today); needsRender = true; return;
+      touchDaily(today); scheduleBody(); return;
     }
     if (!t.classList.contains('in')) { return; }
     var set = t.closest('.set');
@@ -1734,7 +1912,7 @@ details.how[open] summary::after { content: "–"; }
       ev.preventDefault();
       var fname = document.getElementById('cf-name').value.trim().replace(/\s+/g, ' ');
       var fk = num(document.getElementById('cf-kcal').value);
-      if (!fname) { document.getElementById('cf-name').focus(); return; }
+      if (!fname) { flagInput(document.getElementById('cf-name'), true); document.getElementById('cf-name').focus(); toast('Yemeğin adını yaz.', true); return; }
       if (fk === null) { toast('Kaloriyi yaz. Bilmiyorsan paket üstüne ya da bir kalori sitesine bak.'); document.getElementById('cf-kcal').focus(); return; }
       profile.foods.push({ id: 'f' + Date.now().toString(36), name: fname.slice(0, 60), por: document.getElementById('cf-por').value.trim().slice(0, 40) || '1 porsiyon', kcal: fk, p: num(document.getElementById('cf-p').value) || 0, c: num(document.getElementById('cf-c').value) || 0, f: num(document.getElementById('cf-f').value) || 0 });
       touchProfile();
@@ -1746,7 +1924,7 @@ details.how[open] summary::after { content: "–"; }
     if (ev.target.id !== 'supp-form') { return; }
     ev.preventDefault();
     var name = document.getElementById('sf-name').value.trim().replace(/\s+/g, ' ');
-    if (!name) { document.getElementById('sf-name').focus(); return; }
+    if (!name) { flagInput(document.getElementById('sf-name'), true); document.getElementById('sf-name').focus(); toast('Takviyenin adını yaz.', true); return; }
     if (profile.supps.some(function (s) { return s.name.toLowerCase() === name.toLowerCase(); })) { toast(name + ' zaten listede.'); return; }
     profile.supps.push({ id: 'c' + Date.now().toString(36), name: name.slice(0, 60), dose: document.getElementById('sf-dose').value.trim().slice(0, 60), when: document.getElementById('sf-when').value, note: '' });
     touchProfile();
@@ -1757,13 +1935,26 @@ details.how[open] summary::after { content: "–"; }
 
   view.addEventListener('click', function (ev) {
     var wk = ev.target.closest('.wk');
-    if (wk) { sel = +wk.getAttribute('data-i'); renderDay(); renderWeek(); return; }
+    if (wk) { sel = +wk.getAttribute('data-i'); editKey = null; renderDay(); renderWeek(); return; }
     var chk = ev.target.closest('.set .chk');
     if (chk) { toggleSet(chk); return; }
     var b = ev.target.closest('[data-act]');
     if (!b) { return; }
     var act = b.getAttribute('data-act');
-    if (act === 'finish') { cur.fin = true; cur.t1 = Date.now(); touch(cur); renderDay(); renderWeek(); }
+    if (act === 'finish') {
+      var fday = PROGRAM[sel], fdn = doneCount(cur, fday), ftot = totalSets(fday, cur), fdoc = cur;
+      var finishNow = function () { fdoc.fin = true; fdoc.t1 = Date.now(); touch(fdoc); stopRest(); renderDay(); renderWeek(); };
+      if (fdn >= ftot) { finishNow(); }
+      else {
+        confirmSheet(fdn ? ftot + ' setten ' + fdn + '’' + possSuffix(fdn) + ' yapıldı. Yine de bitirelim mi?' : 'Hiç set işaretlenmedi. Yine de bitirelim mi?', 'Devam et', 'Bitir', finishNow);
+      }
+    }
+    else if (act === 'edit-exit') { editKey = null; sel = startSel(); renderDay(); renderWeek(); window.scrollTo(0, 0); }
+    else if (act === 'hist') { showDetail([b.getAttribute('data-k')]); }
+    else if (act === 'hist-day') {
+      var hd = b.getAttribute('data-d');
+      showDetail(histDocs().filter(function (d) { return d.date === hd; }).map(function (d) { return keyOf(d.date, d.s); }));
+    }
     else if (act === 'reopen') { cur.fin = false; touch(cur); renderDay(); renderWeek(); }
     else if (act === 'cardio') { cur.cardio.d = !cur.cardio.d; touch(cur); renderDay(); renderWeek(); }
     else if (act === 'set-add' || act === 'set-del') {
@@ -1867,6 +2058,19 @@ details.how[open] summary::after { content: "–"; }
           s[inp.getAttribute('data-k')][+inp.getAttribute('data-p')] = num(inp.value);
         }
       }
+      /* a set needs reps; weight may stay empty (bodyweight = no added weight) but must be a number when written */
+      var badInp = null, badMsg = '';
+      for (var vi = 0; vi < inputs.length; vi++) {
+        var vin = inputs[vi], vk = vin.getAttribute('data-k'), vtx = vin.value.trim(), vnum = num(vtx);
+        var bad = vk === 'r' ? (!numOk(vtx) || vnum === null || vnum <= 0) : !numOk(vtx);
+        if (bad) {
+          flagInput(vin, true);
+          if (!badInp) { badInp = vin; badMsg = vk === 'r' ? (vtx === '' || vnum === 0 ? 'Tekrar sayısını yaz.' : 'Tekrar sayısı geçersiz.') : 'Kilo geçersiz. Sadece sayı yaz.'; }
+        } else {
+          s[vk][+vin.getAttribute('data-p')] = vnum;
+        }
+      }
+      if (badInp) { toast(badMsg, true); touch(cur); return; }
       for (var cp = 0; cp < e.parts.length; cp++) { if (s.w[cp] !== null) { carryWeight(e, j, cp, null, s.w[cp]); } }
       if (!cur.t0) { cur.t0 = Date.now(); }
     }
@@ -1900,14 +2104,30 @@ details.how[open] summary::after { content: "–"; }
       var box = document.getElementById('dump');
       if (box) { box.innerHTML = '<p class="muted">İndirme bu görünümde açık değil. Aşağıdaki metni kopyalayıp bir .json dosyasına yapıştır.</p><textarea class="dump" id="dump-text" readonly></textarea>'; document.getElementById('dump-text').value = text; }
     }
+    /* phones: open the share sheet (save to Files, Drive, WhatsApp); elsewhere download the file */
+    var file = null;
+    try { file = new File([text], name, { type: 'application/json' }); } catch (e) {}
+    var touchDev = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
     try {
-      var url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
-      var a = document.createElement('a');
-      a.href = url; a.download = name; a.style.display = 'none';
-      document.body.appendChild(a); a.click();
-      setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
-      toast('Yedek indirildi.');
-    } catch (e) { fallback(); }
+      if (file && touchDev && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: 'Antrenman Defteri yedeği' }).then(function () { toast('Yedek hazır.'); }, function (err) {
+          if (err && err.name === 'AbortError') { return; }
+          download();
+        });
+        return;
+      }
+    } catch (e) {}
+    download();
+    function download() {
+      try {
+        var url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+        var a = document.createElement('a');
+        a.href = url; a.download = name; a.style.display = 'none';
+        document.body.appendChild(a); a.click();
+        setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
+        toast('Yedek indirildi.');
+      } catch (e) { fallback(); }
+    }
   }
   function importFile(file) {
     var r = new FileReader();
@@ -1990,9 +2210,8 @@ details.how[open] summary::after { content: "–"; }
     tick();
     restInt = setInterval(tick, 250);
   });
-  document.getElementById('rest-skip').addEventListener('click', function () {
-    clearInterval(restInt); restToken++; restEl.hidden = true;
-  });
+  function stopRest() { clearInterval(restInt); restToken++; restEl.hidden = true; }
+  document.getElementById('rest-skip').addEventListener('click', stopRest);
 
   /* ================= screen stays on while training ================= */
   var wakeLock = null, wantAwake = false;
@@ -2008,7 +2227,7 @@ details.how[open] summary::after { content: "–"; }
   }
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState !== 'visible') { return; }
-    if (refreshDates()) { vd = today; sel = startSel(); softRender(); }
+    if (refreshDates()) { vd = today; editKey = null; sel = startSel(); softRender(); }
     if (wantAwake) { keepAwake(); }
   });
 
