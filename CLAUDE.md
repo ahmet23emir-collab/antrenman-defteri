@@ -142,3 +142,13 @@ Yeni görevler buraya eklenir, biten görev işaretlenir.
   3. Durum tutarlılığı: bugün devam eden, bitmemiş seans iki ekranda da takılma/ilerliyor/kilo artır hesabına girmez; iki ekran aynı seans kümesini kullanır. Rekor ve grafik bitmemiş seansı göstermeye devam edebilir.
   4. "12 hafta" süzmesi 14+ haftalık örnek veriyle test edilir.
   - Bitirince: `sw.js` VERSION 'v7'; 400 px açık ve koyu tema testi; commit + push.
+- [ ] GÖREV 8: Yeni görsel dil ve canlı bileşenler (prototipten taşıma). Geri dönüş noktası: `prototip-oncesi` etiketi. `prototip.html` referans olarak kalır. Bileşenler prototipten kopyalanıp uyarlanır. Veri modeli, program, koçluk kuralları, GÖREV 3'teki antrenman ekranı sırası ve set satırı boyutları, 44 px / 12 px kuralları aynen geçerli. Kullanıcı verisi değişmez veya silinmez; sadece okunur ve mevcut alanlara yazılır.
+  - Commit 1 (bileşenler, mevcut renklerle), sw.js 'v8a':
+    1. Su kontrolü prototipteki su şişesi olur (dalga, kabarcık, +250 ml / −, hedefte halka ve konfeti); veri günlük su alanına yazılır, mevcut su hedefi kullanılır; "Bugün" şeridindeki su düğmesi çalışmaya devam eder.
+    2. Set ✓: daire dolma animasyonu; doğrulama, otomatik doldurma ve Geri al aynen kalır; navigator.vibrate varsa kısa titreşim.
+    3. Dinlenme sayacı: +15 sn, Geç, ekran açık kalma ve "Sıradaki set" korunur; görünüm dairesel halka, son 10 sn nabız, bitişte titreşim; halka tek parça (ek yeri yok).
+    4. Rekor: yeni rekorda 1 saniyelik madalya animasyonu; "Rekor" etiketi ve bildirimi kalır.
+    5. Vücut haritası: Geçmiş > İlerleme'de yeni bölüm; önden/arkadan silüet, kaslar bu haftaki sete göre dolar, dokununca ad ve "X / Y set"; cinsiyet profilden, boşsa küçük seçici ve profile yazılır; sayılar haftalık kas çubuklarıyla aynı hesaptan.
+  - Commit 2 (görsel dil), sw.js 'v8b':
+    6. Prototipin paleti ve görsel dili tüm uygulamaya (koyu öncelikli, vurgu limon yeşili, su camgöbeği, rekor altın); açık tema çalışır; tür renkleri yeni palete uyarlanır, ayırt edilebilir kalır, antrenman adı yazıyla da durur.
+    7. Tüm renk çiftleri iki temada ölçülür: metin ≥ 4,5:1, grafik ≥ 3:1.
