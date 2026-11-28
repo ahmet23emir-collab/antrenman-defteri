@@ -303,7 +303,10 @@ details.notes[open] summary::after { content: "–"; }
 .rest.end .rr-arc { opacity: 0; }
 /* rest over: the ring turns lime and beats twice (sound may be muted, iOS gives no haptic without a touch) */
 .rest.end .rr-track { stroke: var(--bar-accent); stroke-opacity: 1; }
-.rest.end .rest-ring { animation: end-beat .6s ease-in-out 2; }
+.rest.end .rest-ring { animation: end-beat .6s ease-in-out 5; } /* ~3 s */
+.rest.end .rest-in { background: var(--accent); color: var(--on-accent); transition: background .25s ease; }
+.rest.end .rr-track { stroke: var(--on-accent); }
+.rest.end .rb { border-color: var(--on-accent); }
 @keyframes end-beat { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.18); } }
 .rest-ring.pulse { animation: beat 1s ease-in-out infinite; }
 @keyframes beat { 0%, 100% { transform: scale(1); } 18% { transform: scale(1.08); } 36% { transform: scale(1); } 52% { transform: scale(1.04); } }
@@ -1350,10 +1353,11 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       var n = Array.isArray(pat) ? Math.ceil(pat.length / 2) : 1;
       var lb = hapticSwitch();
       for (var i = 0; i < n; i++) {
-        if (i === 0) { lb.click(); } else { setTimeout(function () { lb.click(); }, i * 90); }
+        if (i === 0) { tapSwitch(lb); } else { setTimeout(function () { tapSwitch(lb); }, i * 90); }
       }
     } catch (e) {}
   }
+  function tapSwitch(lb) { var y = window.scrollY; lb.click(); if (window.scrollY !== y) { window.scrollTo(0, y); } }
   function vibrate(pat) { haptic(pat); }
 
   /* ================= record medal (from prototip.html) ================= */
@@ -1996,6 +2000,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       '<label class="lbl" for="protk">Protein katsayısı</label><select class="sel" id="protk">' +
       [1.6, 1.8, 2, 2.2].map(function (k) { return '<option value="' + k + '"' + (profile.protK === k ? ' selected' : '') + '>' + fmt(k) + ' g / kg' + (k === 1.6 ? ' · koruma' : k === 1.8 ? ' · önerilen' : k === 2.2 ? ' · yağ yakarken' : '') + '</option>'; }).join('') +
       '</select></section>';
+    h += '<section class="card"><span class="lbl">Titreşim</span><p class="muted">iPhone’da iOS 18 ve sonrası gerekir; Ayarlar › Ses ve Dokunuş › Sistem Dokunuşları açık olmalı.</p><button type="button" class="btn ghost sm" data-act="haptic-test">Titreşimi dene</button></section>';
     view.innerHTML = h;
   }
   function bodyAvgHTML() {
@@ -2782,6 +2787,10 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     else if (act === 'land-grid') { landGrid = !landGrid; render(); }
     else if (act === 'fin-open') { var fd = findDoc(PROGRAM[sel].sid); finishKey = keyOf(fd.date, fd.s); todayMode = 'finish'; finishFresh = false; render(); window.scrollTo(0, 0); }
     else if (act === 'fin-close') { todayMode = null; render(); window.scrollTo(0, 0); }
+    else if (act === 'haptic-test') {
+      haptic([30, 90, 30]);
+      if (!navigator.vibrate) { toast('İki tık gönderildi. Hissetmediysen telefonun dokunuş ayarına bak.'); }
+    }
     else if (act === 'brief') { briefOpen = !briefOpen; renderWeek(); }
     else if (act === 'edit-exit') { editKey = null; sel = startSel(); renderDay(); renderWeek(); window.scrollTo(0, 0); }
     else if (act === 'hist') { showDetail([b.getAttribute('data-k')]); }
@@ -2912,6 +2921,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
         }
       }
       if (badInp) { toast(badMsg, true); touch(cur); return; }
+      haptic(30); /* first thing after validation: still inside the tap, nothing rendered yet */
       for (var cp = 0; cp < e.parts.length; cp++) { if (s.w[cp] !== null) { carryWeight(e, j, cp, null, s.w[cp]); } }
       if (!cur.t0) { cur.t0 = Date.now(); }
     }
@@ -2927,7 +2937,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       btn.classList.remove('go'); void btn.offsetWidth; btn.classList.add('go');
       var pr = set.querySelector('.pr');
       /* one tick for a set, a double tick when it is also a record */
-      if (pr && !pr.hidden) { haptic([30, 90, 30]); medalPop(); } else { haptic(30); }
+      if (pr && !pr.hidden) { setTimeout(function () { haptic(30); }, 90); medalPop(); }
       if (filled.length) {
         /* quick log from last session: mark it and offer an undo */
         filled.forEach(function (f) { autoMark[autoKey(sdoc, e.id, j, f.p, f.k)] = true; f.inp.setAttribute('data-auto', '1'); f.inp.classList.add('auto'); });
@@ -2948,7 +2958,6 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
         if (adv && adv.kind === 'up') { toast('Kilo hafif kaldı' + (adv.w !== null ? ', ' + fmt(adv.w) + ' kg’a çık.' : '.'), { ms: 6000 }); }
         else if (adv && adv.kind === 'down') { toast('Kilo ağır geldi' + (adv.w ? ', ' + fmt(adv.w) + ' kg’a düş.' : '.'), { ms: 6000 }); }
       }
-      revealNextSet(true);
     }
   }
 
@@ -3052,9 +3061,9 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     try {
       if (!audioCtx) { return; }
       var t = audioCtx.currentTime;
-      [0, 0.25].forEach(function (off) {
+      [0, 0.22, 0.44].forEach(function (off) {
         var o = audioCtx.createOscillator(), g = audioCtx.createGain();
-        o.frequency.value = 880; g.gain.value = 0.15;
+        o.frequency.value = 880; g.gain.value = 0.4;
         o.connect(g); g.connect(audioCtx.destination);
         o.start(t + off); o.stop(t + off + 0.15);
       });
