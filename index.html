@@ -957,9 +957,11 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
 
   /* every distinct exercise, for the progress chart */
   var ALL_EX = [];
-  (function () {
+  function buildAllEx() {
     var seen = {};
+    ALL_EX.length = 0;
     PROGRAM.forEach(function (d) {
+      if (d.off) { return; }
       d.ex.forEach(function (e) {
         e.parts.forEach(function (pn, p) {
           var k = e.id + '|' + p;
@@ -969,7 +971,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
         });
       });
     });
-  })();
+  }
 
   /* ================= supplements ================= */
   var WHEN = { morning: 'Sabah', meal: 'Yemekle', pre: 'Antrenman öncesi', post: 'Antrenman sonrası', any: 'Her gün, saat fark etmez', night: 'Akşam' };
@@ -1213,6 +1215,37 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   /* normProfile fills a default sex; the body map asks only when none was ever saved */
   var sexKnown = (function () { var r = readLS(PROF_KEY); return !!(r && (r.sex === 'e' || r.sex === 'k')); })();
   function saveProfile() { writeLS(PROF_KEY, profile); }
+  /* active program, chosen once at load (GÖREV 11a). Emir's 7 days keep indices 0–6 while 'own' is active.
+     The inactive program's days stay in PROGRAM with off: true, so its old records still open in Geçmiş;
+     off days never enter SESSIONS, the week grid, ALL_EX or the muscle plan. */
+  function installProgram() {
+    var auto = profile.autoProgram;
+    var autoDays = auto ? auto.days.map(function (d) {
+      var o = clone(d);
+      o.extra = o.extra || '';
+      o.ex.forEach(function (e) { if (!e.parts) { e.parts = [e.name]; } });
+      return o;
+    }) : [];
+    if (profile.activeProgram === 'auto' && autoDays.length) {
+      var own = PROGRAM.splice(0, PROGRAM.length);
+      own.forEach(function (d) { d.off = true; });
+      autoDays.forEach(function (d) { PROGRAM.push(d); });
+      own.forEach(function (d) { PROGRAM.push(d); });
+      SESSIONS = autoDays.map(function (d, i) { return i; });
+      MUS_TARGET = {};
+      Object.keys(auto.targets).forEach(function (k) { MUS_TARGET[k] = auto.targets[k]; });
+    } else {
+      autoDays.forEach(function (d) { d.off = true; PROGRAM.push(d); });
+    }
+    buildAllEx();
+  }
+  installProgram();
+  function setActiveProgram(x) {
+    profile.activeProgram = x === 'auto' && profile.autoProgram ? 'auto' : 'own';
+    profile.u = Date.now();
+    saveProfile();
+    location.reload();
+  }
 
   /* ================= cloud sync (falls back to this device) ================= */
   var DB = null, UID = null;
@@ -1910,7 +1943,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   function exHTML(e, idx, doc, first) {
     var arr = setsOf(doc, e);
     var last = lastFor(e.id, doc);
-    var tgt = e.sets + ' × ' + (e.reps ? (e.reps[0] + '–' + e.reps[1] + ' tekrar') : 'maksimum tekrar');
+    var tgt = e.sets + ' × ' + (e.reps ? (e.reps[0] + '–' + e.reps[1] + (e.unit === 'sn' ? ' sn' : ' tekrar')) : 'maksimum tekrar');
     var h = '<article class="ex" data-ex="' + e.id + '" data-n="' + (idx + 1) + '">' +
       '<div class="ex-h"><span class="ex-n">' + (idx + 1) + '</span><div><h3>' + e.name + '</h3>' +
       '<div class="sub"><span class="tgt">' + tgt + '</span>' + (e.eff ? '<span class="eff">' + e.eff + '</span>' : '') + '</div></div></div>';
@@ -1926,7 +1959,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
         var who = (e.parts.length > 1 ? pn + ', ' : '') + 'set ' + (j + 1);
         h += '<div class="part">' + (e.parts.length > 1 ? '<span class="plabel">' + pn + '</span>' : '') +
           '<label class="fld"><input class="in" id="in-' + e.id + '-' + j + '-' + p + '-w" data-k="w" data-p="' + p + '" type="text" inputmode="decimal" autocomplete="off" aria-label="' + who + ' ' + (e.bw ? 'ek kilo' : 'kilo') + '" placeholder="' + (lw !== null ? fmt(lw) : '–') + '" data-ph="' + (lw !== null ? fmt(lw) : '') + '" value="' + fmt(s.w[p]) + '"' + (autoMark[autoKey(doc, e.id, j, p, 'w')] ? ' data-auto="1"' : '') + '><span>' + (e.bw ? '+kg' : 'kg') + '</span></label>' +
-          '<label class="fld"><input class="in" id="in-' + e.id + '-' + j + '-' + p + '-r" data-k="r" data-p="' + p + '" type="text" inputmode="decimal" autocomplete="off" aria-label="' + who + ' tekrar" placeholder="' + (lr !== null ? fmt(lr) : (e.reps ? e.reps[0] + '–' + e.reps[1] : '–')) + '" data-ph="' + (lr !== null ? fmt(lr) : '') + '" value="' + fmt(s.r[p]) + '"' + (autoMark[autoKey(doc, e.id, j, p, 'r')] ? ' data-auto="1"' : '') + '><span>tekrar</span></label></div>';
+          '<label class="fld"><input class="in" id="in-' + e.id + '-' + j + '-' + p + '-r" data-k="r" data-p="' + p + '" type="text" inputmode="decimal" autocomplete="off" aria-label="' + who + ' tekrar" placeholder="' + (lr !== null ? fmt(lr) : (e.reps ? e.reps[0] + '–' + e.reps[1] : '–')) + '" data-ph="' + (lr !== null ? fmt(lr) : '') + '" value="' + fmt(s.r[p]) + '"' + (autoMark[autoKey(doc, e.id, j, p, 'r')] ? ' data-auto="1"' : '') + '><span>' + (e.unit === 'sn' ? 'sn' : 'tekrar') + '</span></label></div>';
       });
       h += '</div><button type="button" class="chk" aria-pressed="' + !!s.d + '" aria-label="Set ' + (j + 1) + ' tamamlandı"><span class="fillc" aria-hidden="true"></span><span class="ripple" aria-hidden="true"></span>' + CHECK + '</button></div>';
       h += '<p class="cap" data-j="' + j + '" hidden></p><div class="fb" data-j="' + j + '" role="status" hidden></div>';
@@ -1980,7 +2013,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
         if (lw === null && lr === null) { return ''; }
         return (e.parts.length > 1 ? pn.split(' ')[0] + ' ' : '') + (lw !== null ? (e.bw ? '+' : '') + fmt(lw) + ' kg × ' : '') + (lr !== null ? fmt(lr) : '–');
       }).filter(Boolean).join(' | ');
-      var range = e.reps ? e.reps[0] + '–' + e.reps[1] + ' tekrar' : 'maksimum tekrar';
+      var range = e.reps ? e.reps[0] + '–' + e.reps[1] + (e.unit === 'sn' ? ' sn' : ' tekrar') : 'maksimum tekrar';
       caps[ci].innerHTML = (prev ? '<b>Geçen sefer</b> ' + prev + ' · <b>hedef</b> ' + range : '<b>Hedef</b> ' + range);
       caps[ci].hidden = false;
     }
@@ -2831,7 +2864,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     h += '<button type="button" class="mini land-more" data-act="land-grid" aria-expanded="' + landGrid + '">' + (landGrid ? 'Listeyi kapat' : 'Başka antrenman seç') + '</button>' + landGridHTML();
     var go = '';
     if (doneToday) { go = '<button type="button" class="btn go" data-act="fin-open">Özeti aç</button>'; }
-    else if (!restDay || day.sid === 'cardio') { go = '<button type="button" class="btn go" data-act="start">Başla</button>'; }
+    else if (!restDay || day.sid === 'cardio' || day.kind === 'cardio') { go = '<button type="button" class="btn go" data-act="start">Başla</button>'; }
     if (go) { h += '<div class="go-wrap">' + go + '</div>'; }
     return h + '</div>';
   }
@@ -3502,6 +3535,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   window.AD.validateProgram = validateProgram;
   window.AD.weeklySets = weeklySets;
   window.AD.POOL = POOL;
+  window.AD.setActiveProgram = setActiveProgram;
 
   /* ================= start ================= */
   sel = startSel();
