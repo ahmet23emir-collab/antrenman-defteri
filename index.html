@@ -754,6 +754,207 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   }
   markLower(PROGRAM);
 
+  /* ================= automatic program engine (GÖREV 11a) =================
+     Rule based, no AI. buildProgram(plan) returns { v, builtAt, plan, days, targets, stepGoal } in the
+     same day/exercise shape as PROGRAM. Muscle indices follow MUS_NAMES:
+     0 Göğüs, 1 Sırt, 2 Omuz, 3 Biceps, 4 Triceps, 5 Ön bacak, 6 Arka bacak, 7 Baldır, 8 Karın, 9 Kalça. */
+  function P(salonId, salonName, evId, evName, kind, lower, mus) {
+    return { salon: { id: salonId, name: salonName }, ev: { id: evId, name: evName }, kind: kind, lower: lower, mus: mus };
+  }
+  var POOL = {
+    hpush: P('chest-press', 'Plate Loaded Chest Press', 'db-bench', 'Dumbbell Bench Press', 'comp', false, [[0, 1], [4, 0.5], [2, 0.5]]),
+    ipush: P('smith-incline', 'Smith Machine Low Incline Press', 'db-incline', 'Dumbbell Incline Press', 'comp', false, [[0, 1], [2, 0.5], [4, 0.5]]),
+    vpush: P('shoulder-press', 'Shoulder Press Machine', 'db-shoulder-press', 'Dumbbell Shoulder Press', 'comp', false, [[2, 1], [4, 0.5]]),
+    lat: P('lateral-raise', 'Lateral Raise', 'db-lateral', 'Dumbbell Lateral Raise', 'iso', false, [[2, 1]]),
+    fly: P('chest-fly', 'Chest Fly Machine', 'db-fly', 'Dumbbell Fly', 'iso', false, [[0, 1]]),
+    tri: P('pushdown', 'Triceps Pushdown', 'db-oh-ext', 'Dumbbell Overhead Triceps Extension', 'iso', false, [[4, 1]]),
+    vpull: P('pulldown', 'Lat Pulldown', 'db-chest-row', 'Chest-Supported Dumbbell Row', 'comp', false, [[1, 1], [3, 0.5]]),
+    hpull: P('cable-row', 'Seated Cable Row', 'db-row', 'One-Arm Dumbbell Row', 'comp', false, [[1, 1], [3, 0.5]]),
+    rear: P('pec-deck-rear', 'Reverse Pec Deck', 'db-rear-delt', 'Dumbbell Rear Delt Raise', 'iso', false, [[2, 1]]),
+    bic: P('cable-curl', 'Cable Curl', 'db-curl', 'Dumbbell Curl', 'iso', false, [[3, 1]]),
+    squat: P('smith-squat', 'Smith Machine Squat', 'goblet-squat', 'Goblet Squat', 'comp', true, [[5, 1], [6, 0.5], [9, 1]]),
+    hinge: P('rdl', 'Romanian Deadlift', 'db-rdl', 'Dumbbell Romanian Deadlift', 'comp', true, [[6, 1], [1, 0.5], [9, 1]]),
+    press: P('leg-press', 'Leg Press', 'bulgarian', 'Bulgarian Split Squat', 'comp', true, [[5, 1], [6, 0.5], [9, 1]]),
+    quad: P('leg-ext', 'Leg Extension', 'reverse-lunge', 'Reverse Lunge', 'iso', true, [[5, 1]]),
+    ham: P('leg-curl', 'Seated Leg Curl', 'sl-rdl', 'Single-Leg Romanian Deadlift', 'iso', true, [[6, 1]]),
+    glute: P('hip-thrust', 'Hip Thrust', 'db-hip-thrust', 'Dumbbell Hip Thrust', 'comp', true, [[9, 1], [6, 0.5]]),
+    calf: P('calf-raise', 'Standing Calf Raise', 'db-calf', 'Dumbbell Calf Raise', 'iso', true, [[7, 1]]),
+    core: P('cable-crunch', 'Cable Crunch', 'plank', 'Plank', 'core', false, [[8, 1]])
+  };
+  /* new exercise ids join the muscle map; existing ids keep their entry */
+  Object.keys(POOL).forEach(function (k) { [POOL[k].salon.id, POOL[k].ev.id].forEach(function (id) { if (!MUS[id]) { MUS[id] = POOL[k].mus; } }); });
+  var TEMPLATES = {
+    3: [
+      { sid: 'a-full1', kind: 'full', title: 'Tüm vücut 1', slots: ['squat', 'hpush', 'vpull', 'vpush', 'ham', 'core', 'bic'] },
+      { sid: 'a-full2', kind: 'full', title: 'Tüm vücut 2', slots: ['hinge', 'ipush', 'hpull', 'lat', 'quad', 'core', 'tri'] },
+      { sid: 'a-full3', kind: 'full', title: 'Tüm vücut 3', slots: ['press', 'hpush', 'hpull', 'glute', 'rear', 'core', 'calf'] }
+    ],
+    4: [
+      { sid: 'a-upper1', kind: 'upper', title: 'Üst 1', slots: ['hpush', 'vpull', 'vpush', 'hpull', 'lat', 'rear', 'bic'] },
+      { sid: 'a-lower1', kind: 'lower', title: 'Alt 1', slots: ['squat', 'hinge', 'quad', 'ham', 'calf', 'core'] },
+      { sid: 'a-upper2', kind: 'upper', title: 'Üst 2', slots: ['ipush', 'hpull', 'vpush', 'vpull', 'fly', 'rear', 'tri'] },
+      { sid: 'a-lower2', kind: 'lower', title: 'Alt 2', slots: ['press', 'glute', 'quad', 'ham', 'calf', 'core'] }
+    ],
+    5: [
+      { sid: 'a-push', kind: 'push', title: 'İtiş', slots: ['hpush', 'vpush', 'ipush', 'lat', 'fly', 'tri'] },
+      { sid: 'a-pull', kind: 'pull', title: 'Çekiş', slots: ['vpull', 'hpull', 'rear', 'bic', 'core'] },
+      { sid: 'a-leg', kind: 'leg', title: 'Bacak', slots: ['squat', 'hinge', 'press', 'quad', 'ham', 'calf'] },
+      { sid: 'a-upper', kind: 'upper', title: 'Üst', slots: ['ipush', 'hpull', 'vpush', 'vpull', 'lat', 'bic', 'tri'] },
+      { sid: 'a-lower', kind: 'lower', title: 'Alt', slots: ['hinge', 'glute', 'quad', 'ham', 'calf', 'core'] }
+    ]
+  };
+  var KIND_TYPE = { full: 'pull', upper: 'push', lower: 'leg', push: 'push', pull: 'pull', leg: 'leg', cardio: 'rest' };
+  var LEVEL_RANGE = { yeni: [8, 10], orta: [10, 14], ileri: [12, 18] };
+  var RIR = { yeni: { comp: 'RIR 2–3', iso: 'RIR 1–2' }, orta: { comp: 'RIR 1–2', iso: 'RIR 1' }, ileri: { comp: 'RIR 1–2', iso: 'RIR 0–1' } };
+  var BALANCED = [0, 1, 2, 3, 4, 5, 6, 7];
+  function autoEx(cat, pos, plan) {
+    var c = POOL[cat], src = c[plan.equip], yeni = plan.level === 'yeni', ev = plan.equip === 'ev';
+    var e = { id: src.id, name: src.name, sets: 3, reps: [10, 15], rest: 75, eff: '', inc: ev ? 2 : (c.lower ? 5 : 2.5), step: ev ? 2 : 2.5, bw: false, lower: c.lower, _c: cat };
+    if (c.kind === 'comp') {
+      e.reps = yeni ? [8, 12] : [6, 10];
+      e.rest = yeni ? 120 : 150;
+      e.sets = pos < 2 ? (plan.level === 'ileri' ? 4 : 3) : 3;
+      e.eff = RIR[plan.level].comp;
+    } else if (c.kind === 'iso') {
+      e.eff = RIR[plan.level].iso;
+    } else {
+      e.sets = yeni ? 2 : 3;
+      if (src.id === 'plank') { e.reps = [30, 60]; e.unit = 'sn'; e.bw = true; }
+    }
+    return e;
+  }
+  function exMus(e) { return e._c ? POOL[e._c].mus : (MUS[e.id] || []); }
+  /* weekly sets per muscle, same arithmetic as weekMuscle(): sets × weight, cardio days skipped */
+  function weeklySets(days) {
+    var w = MUS_NAMES.map(function () { return 0; });
+    days.forEach(function (d) { if (d.type === 'rest') { return; } d.ex.forEach(function (e) { exMus(e).forEach(function (m) { w[m[0]] += e.sets * m[1]; }); }); });
+    return w;
+  }
+  /* 3-day plan: biceps, triceps and calves are judged on their direct sets only (Emir: 3–6) */
+  function directSets(days, m) {
+    var t = 0;
+    days.forEach(function (d) { if (d.type === 'rest') { return; } d.ex.forEach(function (e) { var mm = exMus(e); if (mm[0][0] === m && mm[0][1] === 1) { t += e.sets; } }); });
+    return t;
+  }
+  function rangeOf(plan, m) {
+    var r = (plan.days === 3 && (m === 3 || m === 4 || m === 7)) ? [3, 6] : LEVEL_RANGE[plan.level].slice();
+    return r;
+  }
+  function measure(days, plan, m) { return (plan.days === 3 && (m === 3 || m === 4 || m === 7)) ? directSets(days, m) : weeklySets(days)[m]; }
+  function lowerCat(cat) { return POOL[cat].lower; }
+  function dayFits(d, cat, loose) {
+    if (d.type === 'rest' || d.ex.length >= 8) { return false; }
+    if (d.ex.some(function (e) { return e._c === cat; })) { return false; }
+    if (loose) { return true; }
+    return lowerCat(cat) ? (d.kind === 'lower' || d.kind === 'leg' || d.kind === 'full') : (d.kind !== 'lower' && d.kind !== 'leg');
+  }
+  /* categories that train m first: isolation first; only when the pool has none (Sırt) a compound */
+  function catsFor(m, kinds) {
+    return Object.keys(POOL).filter(function (k) { var c = POOL[k]; return c.mus[0][0] === m && kinds.indexOf(c.kind) >= 0; });
+  }
+  function addSet(days, plan, m, need) {
+    var iso = catsFor(m, ['iso']), pool = iso.length ? iso : catsFor(m, ['comp']);
+    var mine = [];
+    days.forEach(function (d) { d.ex.forEach(function (e) { if (iso.length && iso.indexOf(e._c) >= 0 && e.sets < 5) { mine.push(e); } }); });
+    if (mine.length) {
+      mine.sort(function (a, b) { return a.sets - b.sets; });
+      mine[0].sets++;
+      return true;
+    }
+    /* first a day of the matching kind; when every such day already has it, any training day (spec rule 4) */
+    for (var i = 0; i < pool.length * 2; i++) {
+      var cat = pool[i % pool.length], loose = i >= pool.length, target = null;
+      days.forEach(function (d) { if (dayFits(d, cat, loose) && (!target || d.ex.length < target.ex.length)) { target = d; } });
+      if (target) {
+        var e = autoEx(cat, target.ex.length, plan);
+        e.sets = Math.max(2, Math.min(5, Math.ceil(need)));
+        target.ex.push(e);
+        return true;
+      }
+    }
+    return false;
+  }
+  function removeSet(days, m, floor) {
+    for (var di = days.length - 1; di >= 0; di--) {
+      var ex = days[di].ex;
+      for (var i = ex.length - 1; i >= 0; i--) {
+        var e = ex[i], c = POOL[e._c];
+        if (c && c.kind === 'iso' && c.mus[0][0] === m && e.sets > floor) { e.sets--; return true; }
+      }
+    }
+    return false;
+  }
+  function balance(days, plan) {
+    var form = plan.goal === 'form', glute = plan.gender === 'kadın' ? 12 : 8;
+    for (var guard = 0; guard < 400; guard++) {
+      var changed = false;
+      BALANCED.forEach(function (m) {
+        var r = rangeOf(plan, m), v = measure(days, plan, m), hi = form ? r[0] : r[1];
+        if (v < r[0]) { if (addSet(days, plan, m, r[0] - v)) { changed = true; } }
+        else if (v > hi) {
+          /* take a set away only if the muscle stays at or above its floor */
+          if (v - 1 >= r[0] && removeSet(days, m, 2)) { changed = true; }
+        }
+      });
+      if (weeklySets(days)[9] < glute) {
+        var g = null;
+        days.forEach(function (d) { d.ex.forEach(function (e) { if (e._c === 'glute' && e.sets < 5 && (!g || e.sets < g.sets)) { g = e; } }); });
+        if (g) { g.sets++; changed = true; } else if (addSet(days, plan, 9, glute - weeklySets(days)[9])) { changed = true; }
+      }
+      if (!changed) { break; }
+    }
+  }
+  function buildProgram(plan) {
+    plan = normPlan(plan);
+    if (!plan) { throw new Error('geçersiz plan'); }
+    var days = TEMPLATES[plan.days].map(function (t) {
+      return { sid: t.sid, type: KIND_TYPE[t.kind], kind: t.kind, title: t.title, ex: t.slots.map(function (cat, i) { return autoEx(cat, i, plan); }) };
+    });
+    balance(days, plan);
+    if (plan.goal === 'yag') {
+      [1, 2].forEach(function (n) {
+        days.push({ sid: 'a-cardio' + n, type: 'rest', kind: 'cardio', title: 'Kardiyo ' + n, meta: 'Hafif gün · ağırlık yok', text: '20–30 dakika tempolu yürüyüş veya hafif tempo koşu. Konuşabileceğin hızda kal.', cta: 'Kardiyoyu kaydet', ex: [] });
+      });
+    }
+    var weekly = weeklySets(days), targets = {};
+    targets[9] = plan.gender === 'kadın' ? 12 : 8;
+    days.forEach(function (d) { d.ex.forEach(function (e) { delete e._c; }); });
+    void weekly;
+    return { v: 1, builtAt: new Date().toISOString(), plan: plan, days: days, targets: targets, stepGoal: plan.goal === 'yag' ? 8000 : null };
+  }
+  function validateProgram(prog, plan) {
+    var errors = [], warnings = [], salon = {}, ev = {};
+    Object.keys(POOL).forEach(function (k) { salon[POOL[k].salon.id] = 1; ev[POOL[k].ev.id] = 1; });
+    plan = normPlan(plan || prog.plan);
+    if (!plan) { return { ok: false, errors: ['plan geçersiz'], warnings: warnings }; }
+    if (!normAutoProgram(prog)) { errors.push('kayıt biçimi geçersiz'); }
+    prog.days.forEach(function (d) {
+      if (d.type !== 'rest' && !d.ex.length) { errors.push(d.sid + ' boş'); }
+      var seen = {};
+      d.ex.forEach(function (e) {
+        if (seen[e.id]) { errors.push(d.sid + ' içinde ' + e.id + ' iki kez'); }
+        seen[e.id] = 1;
+        if (!(e.sets >= 1 && e.rest > 0 && Array.isArray(e.reps))) { errors.push(e.id + ' set/tekrar/dinlenme eksik'); }
+        if (plan.equip === 'ev' && !ev[e.id]) { errors.push('ev programında ' + e.id); }
+        if (plan.equip === 'salon' && !salon[e.id]) { errors.push('salon programında ' + e.id); }
+      });
+    });
+    var w = weeklySets(prog.days);
+    /* below the range is always an error. Above it is an error only while an isolation of that muscle could
+       still lose a set; excess that comes from compounds alone is a warning (spec: compounds never change) */
+    BALANCED.forEach(function (m) {
+      var r = rangeOf(plan, m), v = measure(prog.days, plan, m), hi = plan.goal === 'form' ? r[0] : r[1];
+      var msg = MUS_NAMES[m] + ' ' + fmt(v) + ' set, aralık ' + r[0] + '–' + hi;
+      if (v < r[0]) { errors.push(msg); return; }
+      if (v <= hi) { return; }
+      var cut = prog.days.some(function (d) { return d.type !== 'rest' && d.ex.some(function (e) { var mm = MUS[e.id]; return mm && mm.length === 1 && mm[0][0] === m && e.sets > 2 && v - 1 >= r[0]; }); });
+      (cut ? errors : warnings).push(msg);
+    });
+    var g = plan.gender === 'kadın' ? 12 : 8;
+    if (w[9] < g) { errors.push('Kalça ' + w[9] + ' set, hedef ' + g); }
+    return { ok: errors.length === 0, errors: errors, warnings: warnings };
+  }
+
   /* every distinct exercise, for the progress chart */
   var ALL_EX = [];
   (function () {
@@ -3297,6 +3498,10 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   /* test and console hook (GÖREV 11a) */
   window.AD = window.AD || {};
   window.AD.normProfile = normProfile;
+  window.AD.buildProgram = buildProgram;
+  window.AD.validateProgram = validateProgram;
+  window.AD.weeklySets = weeklySets;
+  window.AD.POOL = POOL;
 
   /* ================= start ================= */
   sel = startSel();
