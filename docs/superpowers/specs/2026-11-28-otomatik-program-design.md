@@ -147,7 +147,8 @@ ve Cable Curl Emir'in kimliklerini kullanır, ad havuzdaki addır (geçmiş ayn�
 - İzolasyon: tekrar 10–15, dinlenme 75 sn, 3 set.
 - Core: yeni 2, orta ve ileri 3 set; tekrar 10–15, dinlenme 75 sn. Plank tekrar yerine saniye (30–60),
   rozet "Saniye".
-- Etiket (eff): bileşik "RIR 1–2", izolasyon "RIR 1", core boş.
+- Etiket (eff), seviyeye göre: yeni bileşik "RIR 2–3", izolasyon "RIR 1–2"; orta bileşik "RIR 1–2", izolasyon "RIR 1";
+  ileri bileşik "RIR 1–2", izolasyon "RIR 0–1"; core boş. (Emir'in kararı)
 
 ## Haftalık kas başı set dengeleme
 
@@ -229,5 +230,4 @@ biçimi.
 - Dengelemede hareket başına en çok 5 set, gün başına en çok 8 hareket; set çıkarırken en az 2.
 - Dengeleme yeni izolasyon hareketi eklerse eksik kadar set alır (en az 2, en çok 5); eşit hareket
   sayısında haftanın ilk günü seçilir. Önce set artırma, sonra hareket ekleme denenir.
-- Etiketler: bileşik "RIR 1–2", izolasyon "RIR 1".
 - Üretilen program profile kaydedilir, açılışta yeniden üretilmez.
