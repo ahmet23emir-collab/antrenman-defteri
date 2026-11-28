@@ -930,6 +930,48 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   }
 
   /* ================= storage: profile (supplement list, protein factor) ================= */
+  /* ---- automatic program fields (GÖREV 11a): validated on every read, invalid -> null ---- */
+  var PLAN_VALUES = { gender: ['erkek', 'kadın'], goal: ['kas', 'yag', 'form'], level: ['yeni', 'orta', 'ileri'], equip: ['salon', 'ev'], days: [3, 4, 5] };
+  function normPlan(x) {
+    if (!x || typeof x !== 'object') { return null; }
+    var o = {}, okAll = true;
+    Object.keys(PLAN_VALUES).forEach(function (k) { if (PLAN_VALUES[k].indexOf(x[k]) < 0) { okAll = false; } o[k] = x[k]; });
+    return okAll ? o : null;
+  }
+  function str(v, n) { return typeof v === 'string' ? v.slice(0, n) : ''; }
+  function normAutoEx(e) {
+    if (!e || typeof e.id !== 'string' || !e.id || typeof e.name !== 'string' || !e.name) { return null; }
+    var sets = e.sets | 0, rest = +e.rest, inc = +e.inc, step = +e.step;
+    if (sets < 1 || sets > 8 || !(rest >= 30 && rest <= 300) || !(inc > 0 && inc <= 10) || !(step > 0 && step <= 5)) { return null; }
+    var reps = null;
+    if (e.reps !== null) {
+      if (!Array.isArray(e.reps) || e.reps.length !== 2) { return null; }
+      var lo = e.reps[0] | 0, hi = e.reps[1] | 0;
+      if (lo < 1 || hi > 100 || lo > hi) { return null; }
+      reps = [lo, hi];
+    }
+    var o = { id: e.id.slice(0, 40), name: e.name.slice(0, 80), sets: sets, reps: reps, rest: rest, eff: str(e.eff, 30), inc: inc, step: step, bw: !!e.bw, lower: !!e.lower };
+    if (Array.isArray(e.parts) && e.parts.length && e.parts.every(function (x) { return typeof x === 'string'; })) { o.parts = e.parts.slice(0, 3); }
+    if (e.unit === 'sn') { o.unit = 'sn'; }
+    return o;
+  }
+  function normAutoProgram(a) {
+    if (!a || a.v !== 1 || !Array.isArray(a.days) || !a.days.length || a.days.length > 9) { return null; }
+    var seen = {}, days = [];
+    for (var i = 0; i < a.days.length; i++) {
+      var d = a.days[i];
+      if (!d || typeof d.sid !== 'string' || !/^a-[a-z0-9-]+$/.test(d.sid) || seen[d.sid] || ['push', 'pull', 'leg', 'rest'].indexOf(d.type) < 0 || !Array.isArray(d.ex)) { return null; }
+      seen[d.sid] = true;
+      var ex = d.ex.map(normAutoEx);
+      if (ex.some(function (x) { return !x; }) || (d.type !== 'rest' && !ex.length)) { return null; }
+      var o = { sid: d.sid, type: d.type, kind: str(d.kind, 12) || d.type, title: str(d.title, 40) || d.sid, ex: ex };
+      ['meta', 'text', 'cta', 'tip', 'extra'].forEach(function (k) { if (typeof d[k] === 'string') { o[k] = d[k].slice(0, 300); } });
+      days.push(o);
+    }
+    var targets = {};
+    if (a.targets && typeof a.targets === 'object') { Object.keys(a.targets).forEach(function (k) { var v = +a.targets[k]; if (/^\d+$/.test(k) && v > 0 && v <= 40) { targets[k] = v; } }); }
+    return { v: 1, builtAt: str(a.builtAt, 40), plan: normPlan(a.plan), days: days, targets: targets, stepGoal: +a.stepGoal > 0 ? Math.round(+a.stepGoal) : null };
+  }
   function normProfile(p) {
     var o = { supps: [], protK: 1.8, u: +(p && p.u) || 0 };
     if (p && Array.isArray(p.supps)) {
@@ -961,6 +1003,9 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
         }
       });
     }
+    o.plan = normPlan(p && p.plan);
+    o.autoProgram = normAutoProgram(p && p.autoProgram);
+    o.activeProgram = p && p.activeProgram === 'auto' && o.autoProgram ? 'auto' : 'own';
     return o;
   }
   var profile = normProfile(readLS(PROF_KEY));
@@ -3248,6 +3293,10 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       });
     }).catch(function () {});
   }
+
+  /* test and console hook (GÖREV 11a) */
+  window.AD = window.AD || {};
+  window.AD.normProfile = normProfile;
 
   /* ================= start ================= */
   sel = startSel();
