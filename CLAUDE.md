@@ -169,3 +169,10 @@ Yeni görevler buraya eklenir, biten görev işaretlenir.
   - RIR seviyeye göre: yeni bileşik 2–3 / izolasyon 1–2; orta 1–2 / 1; ileri 1–2 / 0–1. yag: +2 kardiyo günü ve 8.000 adım; form: set aralığının alt sınırı; kalça hedefi kadın 12, erkek 8.
   - Açılışta etkin program yüklenir; diğer programın günleri gizli kalır, kayıtları Geçmiş/İlerleme'de görünür. Haftalık sayaçlar etkin programın gün sayısına göre. `window.AD = { buildProgram, validateProgram, weeklySets, setActiveProgram, normProfile, POOL }`.
   - Testler: `tests/` (108 kombinasyon, profil alanları, program geçişi, Emir'in koç çıktısı karşılaştırması). sw.js 'v11a'.
+- [x] GÖREV 11b: Karşılama ekranı ve program seçimi. Geri dönüş noktası: `karsilama-oncesi` etiketi.
+  - Yalnızca profilde plan yoksa ve hiç antrenman kaydı yoksa çıkar (Emir'e çıkmaz). 6 adım: boy/kilo/yaş, cinsiyet, hedef, seviye, ekipman, gün sayısı (yeni seviyede 5 gün yok, varsayılan 3); sonra "Programın hazır" (günler, hareket sayısı, tahmini süre, haftalık hedef setler) ve "Başla".
+  - Boy, yaş ve cinsiyet profile, kilo bugünün günlük kaydına yazıldığı anda kaydedilir. Seçimler oturum taslağında (`sessionStorage`) tutulur; geri tuşu bir adım geri götürür, yenilemede kalınan adımdan devam eder.
+  - İlk kurulumda kalori ayarı hedefe göre: kas +250, yağ yak −400, genel form 0 (`profile.gk`); Beslenme'de hedef değişince eski +300/−400 kuralı geçerli olur. Mevcut kullanıcılara dokunulmaz.
+  - Vücut > Program: "Benim programım / Otomatik program" sayfa yenilemeden geçer; "Programı yeniden kur" aynı adımları açar, sonda onay ("Kayıtların silinmez. Eski programın 'Benim programım' olarak saklanır."). Eski otomatik programın seansları Geçmiş'te kalır (kayıttan yeniden kurulan gizli gün).
+  - Yedek yüklenince program ve ekranlar sayfa yenilemeden güncellenir. Plank önerisi "saniye" der. `.gitignore`: `yedekler/`.
+  - Test: `tests/onboarding.js`. sw.js 'v11b'.
