@@ -581,6 +581,47 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
 #view.tab-in { animation: tab-in .15s ease-out; }
 @keyframes tab-in { from { opacity: 0; } }
 .ver { margin: 4px 0 0; text-align: center; font-size: .75rem; color: var(--ink-2); }
+/* onboarding (GÖREV 11b): full screen, one question per screen */
+html.ob-open, html.ob-open body { overflow: hidden; }
+.ob { position: fixed; inset: 0; z-index: 60; background: var(--bg); color: var(--ink); overflow-y: auto; overscroll-behavior: contain;
+  padding: calc(env(safe-area-inset-top, 0px) + 8px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px); }
+.ob-in { max-width: 34rem; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; gap: 18px; }
+.ob-top { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 8px; min-height: 48px; }
+.ob-back { appearance: none; width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 12px; background: transparent; color: var(--ink); cursor: pointer; touch-action: manipulation; }
+.ob-back svg { width: 24px; height: 24px; }
+.ob-dots { display: flex; justify-content: center; gap: 6px; }
+.ob-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.ob-dots i.done { background: var(--ink-2); }
+.ob-dots i.cur { background: var(--accent); }
+.ob-n { font-size: .8rem; color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
+.ob-body { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.ob-q { margin: 8px 0 0; font-size: 1.6rem; line-height: 1.15; }
+.ob-q:focus, .ob-h1:focus { outline: none; }
+.ob-sub { margin: 0; color: var(--ink-2); font-size: .95rem; }
+.ob-flds { display: grid; gap: 10px; }
+.ob-err { margin: 0; min-height: 1.2em; color: var(--bad); font-size: .85rem; }
+.ob-cards { display: grid; gap: 10px; }
+.ob-c { appearance: none; text-align: left; width: 100%; min-height: 64px; padding: 14px 16px; border-radius: 16px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink);
+  font: inherit; cursor: pointer; display: grid; gap: 3px; touch-action: manipulation; }
+.ob-c[aria-pressed="true"] { border-color: var(--accent); }
+.ob-ct { font-weight: 700; font-size: 1.1rem; }
+.ob-ct em { font-style: normal; font-weight: 600; color: var(--ink-2); font-size: .9rem; margin-left: 4px; }
+.ob-cs { color: var(--ink-2); font-size: .9rem; line-height: 1.35; }
+.ob-foot { margin-top: auto; display: grid; gap: 10px; padding-top: 8px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.ob-hero { display: grid; gap: 4px; }
+.ob-h1 { margin: 0; font-size: 2.4rem; line-height: 1; }
+.ob-sum { margin: 0; color: var(--ink-2); }
+.ob-list { display: grid; gap: 8px; }
+.ob-day { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 52px; padding: 0 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+.ob-day .pl { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+.ob-day span:last-child { color: var(--ink-2); font-size: .85rem; }
+.ob-wk { display: grid; gap: 8px; }
+.ob-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ob-chip { padding: 6px 10px; border-radius: 10px; background: var(--surface-2); font-size: .85rem; color: var(--ink-2); }
+.ob-chip b { color: var(--ink); }
+.ob-note { margin: 0; font-size: .9rem; color: var(--ink-2); }
+.seg button:disabled { opacity: .45; cursor: default; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } .wb-bubble, .wb-burst, .wb-ring, .medal-pop .spark { display: none !important; } .medal-pop.play svg.md { opacity: 1; } }
 </style>
 </head>
@@ -1193,6 +1234,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     o.sex = p && p.sex === 'k' ? 'k' : 'e';
     o.kadj = p && typeof p.kadj === 'number' && Math.abs(p.kadj) <= 1000 ? p.kadj : 0;
     o.kadjAt = p && typeof p.kadjAt === 'string' ? p.kadjAt : '';
+    o.gk = p && typeof p.gk === 'number' && Math.abs(p.gk) <= 1000 ? p.gk : null;
     o.deloadAt = p && typeof p.deloadAt === 'string' ? p.deloadAt : '';
     o.notes = {};
     if (p && p.notes && typeof p.notes === 'object') {
@@ -1215,9 +1257,32 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   /* normProfile fills a default sex; the body map asks only when none was ever saved */
   var sexKnown = (function () { var r = readLS(PROF_KEY); return !!(r && (r.sex === 'e' || r.sex === 'k')); })();
   function saveProfile() { writeLS(PROF_KEY, profile); }
-  /* active program, chosen once at load (GÖREV 11a). Emir's 7 days keep indices 0–6 while 'own' is active.
-     The inactive program's days stay in PROGRAM with off: true, so its old records still open in Geçmiş;
-     off days never enter SESSIONS, the week grid, ALL_EX or the muscle plan. */
+  /* active program (GÖREV 11a/11b). Emir's 7 days keep indices 0–6 while 'own' is active.
+     The inactive program's days stay in PROGRAM with off: true, so their records still open in Geçmiş;
+     off days never enter SESSIONS, the week grid, ALL_EX or the muscle plan. Re-callable: switching
+     programs or importing a backup re-installs without a page reload. */
+  var OWN_DAYS = PROGRAM.slice();
+  var AUTO_META = {};
+  Object.keys(TEMPLATES).forEach(function (n) { TEMPLATES[n].forEach(function (t) { AUTO_META[t.sid] = { kind: t.kind, title: t.title }; }); });
+  AUTO_META['a-cardio1'] = { kind: 'cardio', title: 'Kardiyo 1' };
+  AUTO_META['a-cardio2'] = { kind: 'cardio', title: 'Kardiyo 2' };
+  function poolName(id) {
+    var n = null;
+    Object.keys(POOL).forEach(function (k) { if (POOL[k].salon.id === id) { n = POOL[k].salon.name; } if (POOL[k].ev.id === id) { n = POOL[k].ev.name; } });
+    return n;
+  }
+  /* a record from an earlier automatic program whose day is no longer in the profile: rebuilt from the record itself */
+  function ghostDay(doc) {
+    var m = AUTO_META[doc.s];
+    if (!m) { return null; }
+    var d = { sid: doc.s, type: KIND_TYPE[m.kind], kind: m.kind, title: m.title, extra: '', off: true, ex: [] };
+    if (m.kind === 'cardio') { d.meta = 'Hafif gün · ağırlık yok'; d.text = ''; d.cta = 'Kardiyoyu kaydet'; }
+    Object.keys(doc.sets).forEach(function (id) {
+      var nm = poolName(id) || id;
+      d.ex.push({ id: id, name: nm, sets: doc.sets[id].length || 1, reps: null, eff: '', rest: 90, parts: [nm], bw: false, inc: 2.5, step: 2.5 });
+    });
+    return d;
+  }
   function installProgram() {
     var auto = profile.autoProgram;
     var autoDays = auto ? auto.days.map(function (d) {
@@ -1226,25 +1291,32 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       o.ex.forEach(function (e) { if (!e.parts) { e.parts = [e.name]; } });
       return o;
     }) : [];
-    if (profile.activeProgram === 'auto' && autoDays.length) {
-      var own = PROGRAM.splice(0, PROGRAM.length);
-      own.forEach(function (d) { d.off = true; });
-      autoDays.forEach(function (d) { PROGRAM.push(d); });
-      own.forEach(function (d) { PROGRAM.push(d); });
-      SESSIONS = autoDays.map(function (d, i) { return i; });
-      MUS_TARGET = {};
-      Object.keys(auto.targets).forEach(function (k) { MUS_TARGET[k] = auto.targets[k]; });
-    } else {
-      autoDays.forEach(function (d) { d.off = true; PROGRAM.push(d); });
-    }
+    var useAuto = profile.activeProgram === 'auto' && autoDays.length > 0;
+    OWN_DAYS.forEach(function (d) { if (useAuto) { d.off = true; } else { delete d.off; } });
+    autoDays.forEach(function (d) { if (!useAuto) { d.off = true; } });
+    PROGRAM.length = 0;
+    (useAuto ? autoDays.concat(OWN_DAYS) : OWN_DAYS.concat(autoDays)).forEach(function (d) { PROGRAM.push(d); });
+    var have = {};
+    PROGRAM.forEach(function (d) { have[d.sid] = true; });
+    liveDocs().forEach(function (doc) { if (!have[doc.s]) { var g = ghostDay(doc); if (g) { have[doc.s] = true; PROGRAM.push(g); } } });
+    SESSIONS = useAuto ? autoDays.map(function (d, i) { return i; }) : [0, 1, 2, 4, 5, 3];
+    MUS_TARGET = {};
+    if (useAuto) { Object.keys(auto.targets).forEach(function (k) { MUS_TARGET[k] = auto.targets[k]; }); } else { MUS_TARGET[9] = 8; }
     buildAllEx();
+    if (typeof progKey !== 'undefined' && !ALL_EX.some(function (x) { return x.key === progKey; })) { progKey = ALL_EX.length ? ALL_EX[0].key : null; }
   }
   installProgram();
+  /* after the program changed while the app is open: pick the right session again and redraw */
+  function reloadProgram() {
+    installProgram();
+    editKey = null; todayMode = null; landGrid = false; landPicked = false;
+    sel = startSel();
+    render();
+  }
   function setActiveProgram(x) {
     profile.activeProgram = x === 'auto' && profile.autoProgram ? 'auto' : 'own';
-    profile.u = Date.now();
-    saveProfile();
-    location.reload();
+    touchProfile();
+    reloadProgram();
   }
 
   /* ================= cloud sync (falls back to this device) ================= */
@@ -1409,7 +1481,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   }
   /* coaching for one finished set: was the weight right for the target reps? */
   function adviceFor(e, s) {
-    var inc = incOf(e), step = stepOf(e);
+    var inc = incOf(e), step = stepOf(e), RW = e.unit === 'sn' ? ' saniye' : ' tekrar', RD = e.unit === 'sn' ? ' saniyede' : ' tekrarda';
     if (!e.reps || !s.d) { return null; }
     var lo = e.reps[0], hi = e.reps[1];
     var upT = Math.min(hi, lo + 1), downT = Math.round((lo + hi) / 2);
@@ -1419,7 +1491,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       if (r === null || r === undefined) { continue; }
       var who = e.parts.length > 1 ? e.parts[p].split(' ')[0] + ': ' : '';
       if (r >= lo && r <= hi) {
-        out = { kind: 'ok', msg: who + r + ' tekrar, hedef ' + lo + '–' + hi + ' aralığında. Bu kiloda devam.' };
+        out = { kind: 'ok', msg: who + r + RW + ', hedef ' + lo + '–' + hi + ' aralığında. Bu kiloda devam.' };
         continue;
       }
       var nw = null;
@@ -1432,11 +1504,11 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
           if (r < lo && nw >= w) { nw = Math.max(0, w - step); }
         } else if (r > hi) { nw = w + inc; }
         if (r > hi) {
-          out = { kind: 'up', p: p, w: nw, msg: who + '<b>' + r + ' tekrar yaptın, hedef ' + lo + '–' + hi + '.</b> Vücut ağırlığı hafif kalıyor. Sonraki sette ' + fmt(nw) + ' kg ek ağırlık tak.' };
+          out = { kind: 'up', p: p, w: nw, msg: who + '<b>' + r + RW + ' yaptın, hedef ' + lo + '–' + hi + '.</b> Vücut ağırlığı hafif kalıyor. Sonraki sette ' + fmt(nw) + ' kg ek ağırlık tak.' };
         } else if (w > 0) {
-          out = { kind: 'down', p: p, w: nw, msg: who + '<b>' + r + ' tekrarda kaldın, hedef ' + lo + '–' + hi + '.</b> Ek ağırlık fazla. ' + (nw ? 'Sonraki sette ' + fmt(nw) + ' kg tak.' : 'Sonraki seti ek ağırlıksız yap.') };
+          out = { kind: 'down', p: p, w: nw, msg: who + '<b>' + r + RD + ' kaldın, hedef ' + lo + '–' + hi + '.</b> Ek ağırlık fazla. ' + (nw ? 'Sonraki sette ' + fmt(nw) + ' kg tak.' : 'Sonraki seti ek ağırlıksız yap.') };
         } else {
-          out = { kind: 'down', p: p, w: null, msg: who + '<b>' + r + ' tekrarda kaldın, hedef ' + lo + '–' + hi + '.</b> Sorun değil, güçlendikçe artar. Dinlenmeyi 3 dakikaya çıkar; tekrar yapamadığında yavaş inişli (negatif) tekrarlarla seti tamamla.' };
+          out = { kind: 'down', p: p, w: null, msg: who + '<b>' + r + RD + ' kaldın, hedef ' + lo + '–' + hi + '.</b> Sorun değil, güçlendikçe artar. Dinlenmeyi 3 dakikaya çıkar; tekrar yapamadığında yavaş inişli (negatif) tekrarlarla seti tamamla.' };
         }
         continue;
       }
@@ -1674,7 +1746,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   var sel = 0;
   var cur = null;
   var suppEdit = false;
-  var progKey = ALL_EX[0].key;
+  var progKey = ALL_EX.length ? ALL_EX[0].key : null;
   var histView = 'seans', progRange = '12';
   var needsRender = false;
   var vd = today; /* the day shown on the Beslenme and Takviye tabs */
@@ -2021,7 +2093,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     var hint = card.querySelector('.hint');
     var show = hitTop(e, arr);
     if (show) {
-      hint.textContent = 'Tüm setlerde ' + e.reps[1] + ' tekrara ulaştın. Gelecek sefer ' + (e.bw ? 'ek ağırlık tak.' : 'ağırlığı ' + fmt(incOf(e)) + ' kg artır.');
+      hint.textContent = 'Tüm setlerde ' + e.reps[1] + (e.unit === 'sn' ? ' saniyeye' : ' tekrara') + ' ulaştın. Gelecek sefer ' + (e.bw ? 'ek ağırlık tak.' : 'ağırlığı ' + fmt(incOf(e)) + ' kg artır.');
     }
     hint.hidden = !show;
   }
@@ -2153,12 +2225,13 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
 
   /* ================= tab: beslenme ================= */
   var pickMeal = null, pickQ = '';
+  function goalK(g) { return profile.gk !== null && g === profile.goal ? profile.gk : (g === 'al' ? 300 : g === 'ver' ? -400 : 0); }
   function kcalGoal() {
     var bw = latestBw();
     if (!bw) { return null; }
     /* Mifflin-St Jeor with a 5-day lifting activity factor when height and age are known; a per-kg estimate otherwise */
     var base = (profile.h && profile.age) ? (10 * bw + 6.25 * profile.h - 5 * profile.age + (profile.sex === 'k' ? -161 : 5)) * 1.55 : bw * 33;
-    return Math.round((base + (profile.goal === 'al' ? 300 : profile.goal === 'ver' ? -400 : 0) + (profile.kadj || 0)) / 50) * 50;
+    return Math.round((base + goalK(profile.goal) + (profile.kadj || 0)) / 50) * 50;
   }
   /* kg per week, from a straight line through the last three weeks of weigh-ins */
   function weightTrend() {
@@ -2232,7 +2305,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       (noFood ? '<div class="nudge"><p>' + (vd === today ? 'Bugün' : 'Bu gün') + ' henüz yemek yok. Öğün ekledikçe kalori ve protein burada toplanır.</p><button type="button" class="btn sm" data-act="pick" data-m="' + nextMeal + '">Yemek ekle</button></div>'
               : mrow('Kalori', t.kcal, kg, 'kcal', 'push') + mrow('Protein', t.p, pg, 'g', 'leg') + mrow('Karbonhidrat', t.c, null, 'g', 'pull') + mrow('Yağ', t.f, null, 'g', 'rest')) + nutAvgLine() +
       '<div class="row2"><div style="display:grid;gap:4px"><label class="lbl" for="goal">Hedef</label><select class="sel" id="goal">' +
-      [['al', 'Kas / kilo al (+300)'], ['koru', 'Kilomu koru'], ['ver', 'Yağ yak (−400)']].map(function (g) { return '<option value="' + g[0] + '"' + (profile.goal === g[0] ? ' selected' : '') + '>' + g[1] + '</option>'; }).join('') +
+      [['al', 'Kas / kilo al (+' + goalK('al') + ')'], ['koru', 'Kilomu koru'], ['ver', 'Yağ yak (−' + Math.abs(goalK('ver')) + ')']].map(function (g) { return '<option value="' + g[0] + '"' + (profile.goal === g[0] ? ' selected' : '') + '>' + g[1] + '</option>'; }).join('') +
       '</select></div><p class="muted" style="align-self:end">' + (kg ? 'Kilona göre yaklaşık hedef. Tartı 2–3 haftada beklediğin gibi gitmezse 200 kcal oynat.' : 'Kilonu Vücut sekmesine yazınca kalori ve protein hedefi hesaplanır.') + '</p></div></section>';
 
     MEALS.forEach(function (mm) {
@@ -2290,6 +2363,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       [1.6, 1.8, 2, 2.2].map(function (k) { return '<option value="' + k + '"' + (profile.protK === k ? ' selected' : '') + '>' + fmt(k) + ' g / kg' + (k === 1.6 ? ' · koruma' : k === 1.8 ? ' · önerilen' : k === 2.2 ? ' · yağ yakarken' : '') + '</option>'; }).join('') +
       '</select></section>';
     h += '<section class="card"><span class="lbl">Titreşim</span><p class="muted">iPhone’da iOS 18 ve sonrası gerekir; Ayarlar › Ses ve Dokunuş › Sistem Dokunuşları açık olmalı.</p><button type="button" class="btn ghost sm" data-act="haptic-test">Titreşimi dene</button></section>';
+    h += programCardHTML();
     h += '<p class="ver" id="app-ver">' + (appVer ? 'Sürüm ' + esc(appVer) : '') + '</p>';
     view.innerHTML = h;
     loadVer();
@@ -3028,7 +3102,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     var t = ev.target;
     if (t.id === 'prog-sel') { progKey = t.value; render(); return; }
     if (t.id === 'protk') { profile.protK = +t.value; touchProfile(); render(); return; }
-    if (t.id === 'goal') { profile.goal = t.value; profile.kadj = 0; profile.kadjAt = ''; touchProfile(); render(); return; }
+    if (t.id === 'goal') { profile.goal = t.value; profile.gk = null; profile.kadj = 0; profile.kadjAt = ''; touchProfile(); render(); return; }
     if (t.id === 'sex') { sexKnown = true; profile.sex = t.value === 'k' ? 'k' : 'e'; touchProfile(); render(); return; }
     if (t.id === 'import-file' && t.files && t.files[0]) { importFile(t.files[0]); t.value = ''; }
   });
@@ -3097,6 +3171,8 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     else if (act === 'start') { todayMode = 'workout'; render(); window.scrollTo(0, 0); revealNextSet(false); }
     else if (act === 'land-grid') { landGrid = !landGrid; render(); }
     else if (act === 'fin-open') { var fd = findDoc(PROGRAM[sel].sid); finishKey = keyOf(fd.date, fd.s); todayMode = 'finish'; finishFresh = false; render(); window.scrollTo(0, 0); }
+    else if (act === 'prog-use') { var pv2 = b.getAttribute('data-v'); if (pv2 !== profile.activeProgram) { setActiveProgram(pv2); toast(pv2 === 'auto' ? 'Otomatik program etkin.' : 'Benim programım etkin.'); } }
+    else if (act === 'prog-redo') { obOpen('redo'); }
     else if (act === 'fin-close') { todayMode = null; render(); window.scrollTo(0, 0); }
     else if (act === 'haptic-test') {
       haptic([30, 90, 30]);
@@ -3345,7 +3421,8 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       });
       if (o.profile && (+o.profile.u || 0) > profile.u) { profile = normProfile(o.profile); if (o.profile.sex === 'e' || o.profile.sex === 'k') { sexKnown = true; } queueWrite('p', 'p'); }
       saveLocal(); saveDaily(); saveProfile();
-      render();
+      obClose(true);
+      reloadProgram();
       toast(nw + ' antrenman, ' + nd + ' gün yüklendi.');
     };
     r.readAsText(file);
@@ -3528,6 +3605,210 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     }).catch(function () {});
   }
 
+  /* ================= onboarding: first setup and "Programı yeniden kur" (GÖREV 11b) =================
+     One question per screen. Answers live in a session draft, so the back key, a reload or a half-finished
+     flow loses nothing; body values are written to the profile and today's daily entry as they are typed,
+     exactly like the Vücut fields. Nothing is saved as a program until the last button. */
+  var OB_DRAFT = 'antrenman-defteri-setup';
+  var ob = null, obEl = null;
+  var OB_STEPS = 6;
+  var OB_GOALS = [['kas', 'Kas kazan', 'Kilo alırken kas yap.'], ['yag', 'Yağ yak, formu koru', 'Kas kaybetmeden yağ ver.'], ['form', 'Genel form', 'Güçlü ve hareketli kal.']];
+  var OB_LEVELS = [['yeni', 'Yeni', '0–6 ay', 'Hareketleri öğreniyorsun, ağırlıklar hızlı artıyor.'], ['orta', 'Orta', '6 ay–2 yıl', 'Temel hareketleri biliyorsun, ilerleme yavaşladı.'], ['ileri', 'İleri', '2 yıl+', 'Düzenli çalışıyorsun, ilerlemek için daha çok set gerekiyor.']];
+  var OB_EQUIP = [['salon', 'Salon', 'Makineler, kablolar ve serbest ağırlık.'], ['ev', 'Ev', 'Bir çift ayarlı dambıl ve bank yeter.']];
+  var OB_DAYS = [[3, '3 gün', 'Tüm vücut, üç farklı gün.'], [4, '4 gün', 'Üst vücut ve alt vücut, ikişer kez.'], [5, '5 gün', 'İtiş, çekiş, bacak, üst, alt.']];
+  var GOAL_KCAL = { kas: ['al', 250], yag: ['ver', -400], form: ['koru', 0] };
+  function obSave() { try { if (ob) { sessionStorage.setItem(OB_DRAFT, JSON.stringify({ mode: ob.mode, step: ob.step, plan: ob.plan })); } else { sessionStorage.removeItem(OB_DRAFT); } } catch (e) {} }
+  function obDraft() { try { var d = JSON.parse(sessionStorage.getItem(OB_DRAFT) || 'null'); return d && (d.mode === 'first' || d.mode === 'redo') ? d : null; } catch (e) { return null; } }
+  function obNeeded() { return !profile.plan && liveDocs().length === 0; }
+  function obBoot() {
+    var d = obDraft();
+    if (obNeeded()) { obOpen('first', d && d.mode === 'first' ? d : null); }
+    else if (d && d.mode === 'redo') { obOpen('redo', d); }
+    else if (d) { try { sessionStorage.removeItem(OB_DRAFT); } catch (e) {} }
+  }
+  function obOpen(mode, draft) {
+    var pl = profile.plan || {};
+    ob = { mode: mode, step: 0, plan: { gender: profile.sex === 'k' ? 'kadın' : (sexKnown ? 'erkek' : null), goal: pl.goal || null, level: pl.level || null, equip: pl.equip || null, days: pl.days || 3 } };
+    if (draft) { ob.step = Math.max(0, Math.min(OB_STEPS, draft.step | 0)); Object.keys(ob.plan).forEach(function (k) { if (draft.plan && draft.plan[k] !== undefined) { ob.plan[k] = draft.plan[k]; } }); }
+    if (!obEl) {
+      obEl = document.createElement('div');
+      obEl.className = 'ob';
+      obEl.setAttribute('role', 'dialog');
+      obEl.setAttribute('aria-modal', 'true');
+      obEl.setAttribute('aria-label', mode === 'first' ? 'Programını kur' : 'Programı yeniden kur');
+      obEl.addEventListener('click', obClick);
+      obEl.addEventListener('input', obInput);
+      document.body.appendChild(obEl);
+      document.documentElement.classList.add('ob-open');
+      try { history.pushState({ ob: 1 }, ''); } catch (e) {}
+    }
+    obSave();
+    obRender(false);
+  }
+  /* silent: closed by an import, no history step to undo */
+  function obClose(silent) {
+    if (!obEl) { return; }
+    obEl.remove(); obEl = null; ob = null;
+    document.documentElement.classList.remove('ob-open');
+    obSave();
+    if (!silent) { try { if (history.state && history.state.ob) { history.back(); } } catch (e) {} }
+  }
+  /* back key: one step back; on the first question of a re-setup it closes, on the first setup it stays */
+  window.addEventListener('popstate', function () {
+    if (!ob) { return; }
+    if (ob.step > 0) { obGo(ob.step - 1); }
+    else if (ob.mode === 'redo') { var el = obEl; obEl = null; ob = null; if (el) { el.remove(); } document.documentElement.classList.remove('ob-open'); obSave(); return; }
+    try { history.pushState({ ob: 1 }, ''); } catch (e) {}
+  });
+  function obBodyOk() {
+    return !!(profile.h && profile.age && latestBw());
+  }
+  function obGo(n) {
+    if (n === 6 && !ob.plan.days) { n = 5; }
+    ob.step = Math.max(0, Math.min(OB_STEPS, n));
+    obSave();
+    obRender(true);
+  }
+  function obPlan() { return normPlan(ob.plan); }
+  function obCard(act, val, title, tag, sub, on) {
+    return '<button type="button" class="ob-c" data-ob="' + act + '" data-v="' + val + '" aria-pressed="' + !!on + '">' +
+      '<span class="ob-ct">' + esc(title) + (tag ? ' <em>' + esc(tag) + '</em>' : '') + '</span>' + (sub ? '<span class="ob-cs">' + esc(sub) + '</span>' : '') + '</button>';
+  }
+  function obDayMinutes(d) { var sec = d.ex.reduce(function (a, e) { return a + e.sets * ((e.rest || 90) + 40); }, 0); return Math.max(5, Math.round(sec / 300) * 5); }
+  function obReadyHTML() {
+    var plan = obPlan();
+    if (!plan) { return '<p class="muted">Bir adım eksik kaldı.</p>'; }
+    var prog = buildProgram(plan);
+    ob.prog = prog;
+    var w = weeklySets(prog.days);
+    var lifts = prog.days.filter(function (d) { return d.type !== 'rest'; });
+    var sum = [plan.days + ' gün', plan.equip === 'ev' ? 'Ev' : 'Salon', OB_LEVELS.filter(function (x) { return x[0] === plan.level; })[0][1], OB_GOALS.filter(function (x) { return x[0] === plan.goal; })[0][1]].join(' · ');
+    var h = '<section class="ob-hero"><span class="lbl">' + (ob.mode === 'first' ? 'Hepsi bu kadar' : 'Yeni programın') + '</span><h1 class="ob-h1" tabindex="-1">Programın hazır</h1><p class="ob-sum">' + esc(sum) + '</p></section>';
+    h += '<section class="ob-list" aria-label="Günler">' + prog.days.map(function (d, i) {
+      var meta = d.type === 'rest' ? 'Kardiyo · 20–30 dk' : d.ex.length + ' hareket · ~' + obDayMinutes(d) + ' dk';
+      return '<div class="ob-day"><span class="pl" style="--c:var(--' + d.type + ')"></span><b>' + esc(d.title) + '</b><span>' + meta + '</span></div>';
+    }).join('') + '</section>';
+    var chips = [0, 1, 2, 3, 4, 5, 6, 7, 9].filter(function (m) { return w[m] > 0; }).map(function (m) {
+      var v = m === 9 ? prog.targets[9] : w[m];
+      return '<span class="ob-chip"><b>' + fmt(v) + '</b> ' + MUS_NAMES[m] + '</span>';
+    }).join('');
+    h += '<section class="ob-wk"><span class="lbl">Haftalık hedef set · kas başına</span><div class="ob-chips">' + chips + '</div>' +
+      '<p class="muted">' + lifts.length + ' antrenman günü' + (prog.stepGoal ? ', günde ' + prog.stepGoal.toLocaleString('tr-TR') + ' adım' : '') + '. Set ve tekrar aralıkları seviyene göre.</p></section>';
+    if (ob.mode === 'first') {
+      h += '<div class="ob-foot"><button type="button" class="btn go" data-ob="done">Başla</button></div>';
+    } else {
+      h += '<div class="ob-foot"><p class="ob-note">Kayıtların silinmez. Eski programın ‘Benim programım’ olarak saklanır.</p>' +
+        '<button type="button" class="btn go" data-ob="done">Programı kullan</button><button type="button" class="btn ghost" data-ob="cancel">Vazgeç</button></div>';
+    }
+    return h;
+  }
+  function obStepHTML() {
+    var p = ob.plan, s = ob.step, h = '';
+    if (s === 0) {
+      var dd = dayDoc(today);
+      h += '<h1 class="ob-q" tabindex="-1">Boyun, kilon ve yaşın</h1><p class="ob-sub">Protein, su ve kalori hedeflerin bunlarla hesaplanır.</p>' +
+        '<div class="ob-flds">' +
+        '<label class="fld ob-fld"><input id="ob-h" type="text" inputmode="numeric" autocomplete="off" aria-label="Boy" placeholder="Boy" value="' + fmt(profile.h) + '"><span>cm</span></label>' +
+        '<label class="fld ob-fld"><input id="ob-bw" type="text" inputmode="decimal" autocomplete="off" aria-label="Kilo" placeholder="Kilo" value="' + fmt(dd.bw || latestBw()) + '"><span>kg</span></label>' +
+        '<label class="fld ob-fld"><input id="ob-age" type="text" inputmode="numeric" autocomplete="off" aria-label="Yaş" placeholder="Yaş" value="' + fmt(profile.age) + '"><span>yaş</span></label></div>' +
+        '<p class="ob-err" id="ob-err" role="status"></p>' +
+        '<div class="ob-foot"><button type="button" class="btn go" data-ob="next"' + (obBodyOk() ? '' : ' disabled') + '>Devam</button></div>';
+    } else if (s === 1) {
+      h += '<h1 class="ob-q" tabindex="-1">Cinsiyetin</h1><div class="ob-cards">' +
+        obCard('gender', 'erkek', 'Erkek', '', '', p.gender === 'erkek') + obCard('gender', 'kadın', 'Kadın', '', '', p.gender === 'kadın') +
+        '</div><p class="ob-sub">Kalori ve protein hesabı için.</p>';
+    } else if (s === 2) {
+      h += '<h1 class="ob-q" tabindex="-1">Hedefin ne?</h1><div class="ob-cards">' + OB_GOALS.map(function (g) { return obCard('goal', g[0], g[1], '', g[2], p.goal === g[0]); }).join('') + '</div>';
+    } else if (s === 3) {
+      h += '<h1 class="ob-q" tabindex="-1">Ne kadar süredir antrenman yapıyorsun?</h1><div class="ob-cards">' + OB_LEVELS.map(function (g) { return obCard('level', g[0], g[1], g[2], g[3], p.level === g[0]); }).join('') + '</div>';
+    } else if (s === 4) {
+      h += '<h1 class="ob-q" tabindex="-1">Nerede çalışacaksın?</h1><div class="ob-cards">' + OB_EQUIP.map(function (g) { return obCard('equip', g[0], g[1], '', g[2], p.equip === g[0]); }).join('') + '</div>';
+    } else if (s === 5) {
+      var opts = OB_DAYS.filter(function (g) { return !(p.level === 'yeni' && g[0] === 5); });
+      h += '<h1 class="ob-q" tabindex="-1">Haftada kaç gün?</h1><div class="ob-cards">' + opts.map(function (g) { return obCard('days', g[0], g[1], '', g[2], p.days === g[0]); }).join('') + '</div>' +
+        (p.level === 'yeni' ? '<p class="ob-sub">Başlarken 3 gün en iyi toparlanmayı verir.</p>' : '');
+    } else {
+      return obReadyHTML();
+    }
+    return h;
+  }
+  function obRender(anim) {
+    if (!obEl) { return; }
+    var s = ob.step;
+    var dots = '';
+    for (var i = 0; i < OB_STEPS; i++) { dots += '<i class="' + (i < s ? 'done' : (i === s ? 'cur' : '')) + '"></i>'; }
+    var back = s > 0 || ob.mode === 'redo';
+    obEl.innerHTML = '<div class="ob-in' + (anim ? ' ob-fade' : '') + '"><div class="ob-top">' +
+      (back ? '<button type="button" class="ob-back" data-ob="back" aria-label="' + (s > 0 ? 'Önceki adım' : 'Kapat') + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' : '<span class="ob-back" aria-hidden="true"></span>') +
+      (s < OB_STEPS ? '<div class="ob-dots" role="img" aria-label="Adım ' + (s + 1) + ' / ' + OB_STEPS + '">' + dots + '</div><span class="ob-n">' + (s + 1) + ' / ' + OB_STEPS + '</span>' : '<span></span><span></span>') +
+      '</div><div class="ob-body">' + obStepHTML() + '</div></div>';
+    obEl.scrollTop = 0;
+    var q = obEl.querySelector('.ob-q, .ob-h1');
+    if (q && anim) { try { q.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  function obInput(ev) {
+    var t = ev.target, v = num(t.value), err = '';
+    if (t.id === 'ob-h') { profile.h = v && v >= 120 && v <= 230 ? v : null; touchProfile(); if (t.value && !profile.h) { err = 'Boyu 120–230 cm arasında yaz.'; } }
+    else if (t.id === 'ob-age') { profile.age = v && v >= 12 && v <= 90 ? Math.round(v) : null; touchProfile(); if (t.value && !profile.age) { err = 'Yaşı 12–90 arasında yaz.'; } }
+    else if (t.id === 'ob-bw') { var dd = dayDoc(today); dd.bw = v && v >= 30 && v <= 300 ? v : null; touchDaily(today); if (t.value && !dd.bw) { err = 'Kiloyu 30–300 kg arasında yaz.'; } }
+    else { return; }
+    t.setAttribute('aria-invalid', err ? 'true' : 'false');
+    var e = document.getElementById('ob-err'); if (e) { e.textContent = err; }
+    var nb = obEl.querySelector('[data-ob="next"]'); if (nb) { nb.disabled = !obBodyOk(); }
+  }
+  function obClick(ev) {
+    var b = ev.target.closest('[data-ob]');
+    if (!b || !ob) { return; }
+    var a = b.getAttribute('data-ob'), v = b.getAttribute('data-v');
+    if (a === 'back') { if (ob.step > 0) { obGo(ob.step - 1); } else { obClose(false); } return; }
+    if (a === 'next') { if (obBodyOk()) { obGo(1); } return; }
+    if (a === 'cancel') { obClose(false); return; }
+    if (a === 'done') { obFinish(); return; }
+    if (a === 'gender') { ob.plan.gender = v; profile.sex = v === 'kadın' ? 'k' : 'e'; sexKnown = true; touchProfile(); }
+    else if (a === 'goal') { ob.plan.goal = v; }
+    else if (a === 'level') { ob.plan.level = v; if (v === 'yeni' && ob.plan.days === 5) { ob.plan.days = 3; } }
+    else if (a === 'equip') { ob.plan.equip = v; }
+    else if (a === 'days') { ob.plan.days = +v; }
+    else { return; }
+    $$all(obEl, '[data-ob="' + a + '"]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    haptic(10);
+    var next = ob.step + 1;
+    obSave();
+    setTimeout(function () { if (ob && ob.step === next - 1) { obGo(next); } }, 160);
+  }
+  function $$all(root, sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); }
+  function obFinish() {
+    var plan = obPlan();
+    if (!plan) { return; }
+    var first = ob.mode === 'first';
+    var prog = ob.prog && JSON.stringify(ob.prog.plan) === JSON.stringify(plan) ? ob.prog : buildProgram(plan);
+    profile.plan = plan;
+    profile.autoProgram = normAutoProgram(prog);
+    profile.activeProgram = 'auto';
+    if (first) {
+      /* first setup only: calorie offset follows the goal; existing users keep their own setting */
+      profile.goal = GOAL_KCAL[plan.goal][0]; profile.gk = GOAL_KCAL[plan.goal][1]; profile.kadj = 0; profile.kadjAt = '';
+    }
+    touchProfile();
+    obClose(true);
+    try { if (history.state && history.state.ob) { history.replaceState(null, '', '#antrenman'); } } catch (e) {}
+    tab = 'antrenman';
+    reloadProgram();
+    view.classList.remove('tab-in'); void view.offsetWidth; view.classList.add('tab-in');
+    window.scrollTo(0, 0);
+    if (!first) { toast('Yeni program etkin. Kayıtların duruyor.'); }
+  }
+  function programCardHTML() {
+    var auto = profile.autoProgram, cur = profile.activeProgram, pl = auto && auto.plan;
+    var desc = pl ? pl.days + ' gün · ' + (pl.equip === 'ev' ? 'Ev' : 'Salon') + ' · ' + OB_LEVELS.filter(function (x) { return x[0] === pl.level; })[0][1] + ' · ' + OB_GOALS.filter(function (x) { return x[0] === pl.goal; })[0][1] : '';
+    return '<section class="card" id="prog-card"><span class="lbl">Program</span>' +
+      '<div class="seg" role="group" aria-label="Etkin program">' +
+      '<button type="button" data-act="prog-use" data-v="own" aria-pressed="' + (cur === 'own') + '">Benim programım</button>' +
+      '<button type="button" data-act="prog-use" data-v="auto" aria-pressed="' + (cur === 'auto') + '"' + (auto ? '' : ' disabled') + '>Otomatik program</button></div>' +
+      '<p class="muted">' + (auto ? 'Otomatik: ' + esc(desc) + '. ' : 'Otomatik program henüz kurulmadı. ') + 'Geçişte kayıtların silinmez, iki programın seansları da Geçmiş’te kalır.</p>' +
+      '<button type="button" class="btn ghost" data-act="prog-redo">Programı yeniden kur</button></section>';
+  }
+
   /* test and console hook (GÖREV 11a) */
   window.AD = window.AD || {};
   window.AD.normProfile = normProfile;
@@ -3536,6 +3817,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   window.AD.weeklySets = weeklySets;
   window.AD.POOL = POOL;
   window.AD.setActiveProgram = setActiveProgram;
+  window.AD.obOpen = obOpen;
 
   /* ================= start ================= */
   sel = startSel();
@@ -3543,6 +3825,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   tab = TABS.indexOf(h0) >= 0 ? h0 : 'antrenman';
   render();
   if (tab === 'antrenman') { revealNextSet(false); }
+  obBoot();
   initCloud();
 })();
 </script>
