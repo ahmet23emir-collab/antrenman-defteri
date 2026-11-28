@@ -581,6 +581,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
 .sec-h > span:first-child { font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; letter-spacing: .01em; color: var(--ink); }
 #view.tab-in { animation: tab-in .15s ease-out; }
 @keyframes tab-in { from { opacity: 0; } }
+.ver { margin: 4px 0 0; text-align: center; font-size: .75rem; color: var(--ink-2); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } .wb-bubble, .wb-burst, .wb-ring, .medal-pop .spark { display: none !important; } .medal-pop.play svg.md { opacity: 1; } }
 </style>
 </head>
@@ -2001,7 +2002,28 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       [1.6, 1.8, 2, 2.2].map(function (k) { return '<option value="' + k + '"' + (profile.protK === k ? ' selected' : '') + '>' + fmt(k) + ' g / kg' + (k === 1.6 ? ' · koruma' : k === 1.8 ? ' · önerilen' : k === 2.2 ? ' · yağ yakarken' : '') + '</option>'; }).join('') +
       '</select></section>';
     h += '<section class="card"><span class="lbl">Titreşim</span><p class="muted">iPhone’da iOS 18 ve sonrası gerekir; Ayarlar › Ses ve Dokunuş › Sistem Dokunuşları açık olmalı.</p><button type="button" class="btn ghost sm" data-act="haptic-test">Titreşimi dene</button></section>';
+    h += '<p class="ver" id="app-ver">' + (appVer ? 'Sürüm ' + esc(appVer) : '') + '</p>';
     view.innerHTML = h;
+    loadVer();
+  }
+  /* version = sw.js VERSION: read from the active cache name ("antrenman-v10d"), which also works offline; else from sw.js itself */
+  var appVer = '';
+  function loadVer() {
+    if (appVer) { return; }
+    function show(v) { if (!v) { return; } appVer = v; var el = document.getElementById('app-ver'); if (el) { el.textContent = 'Sürüm ' + v; } }
+    function fromFile() {
+      try { fetch('sw.js', { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) { var m = t.match(/VERSION = '([^']+)'/); show(m && m[1]); }).catch(function () {}); } catch (e) {}
+    }
+    try {
+      if (window.caches && caches.keys) {
+        caches.keys().then(function (ks) {
+          var k = ks.filter(function (x) { return /^antrenman-v/.test(x); }).sort().pop();
+          if (k) { show(k.replace('antrenman-', '')); } else { fromFile(); }
+        }, fromFile);
+        return;
+      }
+    } catch (e) {}
+    fromFile();
   }
   function bodyAvgHTML() {
     var sl = [], stp = [];
