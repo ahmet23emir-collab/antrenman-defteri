@@ -142,7 +142,7 @@ Yeni görevler buraya eklenir, biten görev işaretlenir.
   3. Durum tutarlılığı: bugün devam eden, bitmemiş seans iki ekranda da takılma/ilerliyor/kilo artır hesabına girmez; iki ekran aynı seans kümesini kullanır. Rekor ve grafik bitmemiş seansı göstermeye devam edebilir.
   4. "12 hafta" süzmesi 14+ haftalık örnek veriyle test edilir.
   - Bitirince: `sw.js` VERSION 'v7'; 400 px açık ve koyu tema testi; commit + push.
-- [ ] GÖREV 8: Yeni görsel dil ve canlı bileşenler (prototipten taşıma). Geri dönüş noktası: `prototip-oncesi` etiketi. `prototip.html` referans olarak kalır. Bileşenler prototipten kopyalanıp uyarlanır. Veri modeli, program, koçluk kuralları, GÖREV 3'teki antrenman ekranı sırası ve set satırı boyutları, 44 px / 12 px kuralları aynen geçerli. Kullanıcı verisi değişmez veya silinmez; sadece okunur ve mevcut alanlara yazılır.
+- [x] GÖREV 8: Yeni görsel dil ve canlı bileşenler (prototipten taşıma). Geri dönüş noktası: `prototip-oncesi` etiketi. `prototip.html` referans olarak kalır. Bileşenler prototipten kopyalanıp uyarlanır. Veri modeli, program, koçluk kuralları, GÖREV 3'teki antrenman ekranı sırası ve set satırı boyutları, 44 px / 12 px kuralları aynen geçerli. Kullanıcı verisi değişmez veya silinmez; sadece okunur ve mevcut alanlara yazılır.
   - Commit 1 (bileşenler, mevcut renklerle), sw.js 'v8a':
     1. Su kontrolü prototipteki su şişesi olur (dalga, kabarcık, +250 ml / −, hedefte halka ve konfeti); veri günlük su alanına yazılır, mevcut su hedefi kullanılır; "Bugün" şeridindeki su düğmesi çalışmaya devam eder.
     2. Set ✓: daire dolma animasyonu; doğrulama, otomatik doldurma ve Geri al aynen kalır; navigator.vibrate varsa kısa titreşim.
