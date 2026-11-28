@@ -749,6 +749,11 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     'leg-press': [[5, 1], [6, 0.5], [9, 1]], 'smith-squat': [[5, 1], [6, 0.5], [9, 1]], 'leg-ext': [[5, 1]], 'leg-curl': [[6, 1]], 'calf-raise': [[7, 1]]
   };
 
+  function markLower(days) {
+    days.forEach(function (d) { d.ex.forEach(function (e) { var m = MUS[e.id]; if (typeof e.lower !== 'boolean') { e.lower = !!(m && [5, 6, 7, 9].indexOf(m[0][0]) >= 0); } }); });
+  }
+  markLower(PROGRAM);
+
   /* every distinct exercise, for the progress chart */
   var ALL_EX = [];
   (function () {
@@ -847,7 +852,11 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   function liters(ml) { return (Math.round(ml / 50) / 20).toFixed(2).replace(/0$/, '').replace('.', ','); }
   function mmss(s) { return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
   function e1rm(w, r) { return r <= 1 ? w : w * (1 + r / 30); }
-  function round25(x) { return Math.max(0, Math.round(x / 2.5) * 2.5); }
+  /* weight step per exercise (coach rule: lower body +5 kg, upper body +2,5 kg, dumbbells at home 2 kg).
+     It follows the exercise's own muscle group, not the day; an explicit e.inc / e.step wins. */
+  function incOf(e) { return typeof e.inc === 'number' ? e.inc : (e.bw ? 2.5 : (e.lower ? 5 : 2.5)); }
+  function stepOf(e) { return typeof e.step === 'number' && e.step > 0 ? e.step : 2.5; }
+  function roundStep(x, step) { return Math.max(0, Math.round(x / step) * step); }
 
   /* ================= storage: workouts ================= */
   function keyOf(date, sid) { return date + '_' + sid; }
@@ -1120,7 +1129,8 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     });
   }
   /* coaching for one finished set: was the weight right for the target reps? */
-  function adviceFor(e, s, leg) {
+  function adviceFor(e, s) {
+    var inc = incOf(e), step = stepOf(e);
     if (!e.reps || !s.d) { return null; }
     var lo = e.reps[0], hi = e.reps[1];
     var upT = Math.min(hi, lo + 1), downT = Math.round((lo + hi) / 2);
@@ -1138,10 +1148,10 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
         var bw = latestBw();
         if (bw) {
           var total = (bw + w) * (1 + r / 30);
-          nw = round25(total / (1 + (r > hi ? upT : downT) / 30) - bw);
-          if (r > hi && nw <= w) { nw = w + 2.5; }
-          if (r < lo && nw >= w) { nw = Math.max(0, w - 2.5); }
-        } else if (r > hi) { nw = w + 2.5; }
+          nw = roundStep(total / (1 + (r > hi ? upT : downT) / 30) - bw, step);
+          if (r > hi && nw <= w) { nw = w + inc; }
+          if (r < lo && nw >= w) { nw = Math.max(0, w - step); }
+        } else if (r > hi) { nw = w + inc; }
         if (r > hi) {
           out = { kind: 'up', p: p, w: nw, msg: who + '<b>' + r + ' tekrar yaptın, hedef ' + lo + '–' + hi + '.</b> Vücut ağırlığı hafif kalıyor. Sonraki sette ' + fmt(nw) + ' kg ek ağırlık tak.' };
         } else if (w > 0) {
@@ -1154,14 +1164,13 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       if (!w) { continue; }
       var est = e1rm(w, r);
       if (r > hi) {
-        nw = round25(est / (1 + upT / 30));
-        var minUp = leg ? 5 : 2.5;
-        if (nw < w + minUp) { nw = w + minUp; }
+        nw = roundStep(est / (1 + upT / 30), step);
+        if (nw < w + inc) { nw = w + inc; }
         out = { kind: 'up', p: p, w: nw, msg: who + '<b>' + r + ' tekrar yaptın, hedef ' + lo + '–' + hi + '. Bu kilo hafif.</b> Sonraki sette ' + fmt(nw) + ' kg ile ' + (upT === hi ? hi : upT + '–' + hi) + ' tekrar hedefle.' };
       } else {
-        nw = round25(est / (1 + downT / 30));
-        if (nw >= w) { nw = w - 2.5; }
-        nw = Math.max(2.5, nw);
+        nw = roundStep(est / (1 + downT / 30), step);
+        if (nw >= w) { nw = w - step; }
+        nw = Math.max(step, nw);
         out = { kind: 'down', p: p, w: nw, msg: who + '<b>' + r + ' tekrarda kaldın, hedef ' + lo + '–' + hi + '. Bu kilo ağır.</b> Sonraki sette ' + fmt(nw) + ' kg’a düş.' };
       }
     }
@@ -1593,13 +1602,13 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     if (e.bw || !last) { return ''; }
     var w = lastVal(last, 0, 0, 'w');
     if (!w || w < 20) { return ''; }
-    return '<p class="warm"><b>Isınma</b> ' + fmt(round25(w * 0.5)) + ' kg × 6 · ' + fmt(round25(w * 0.75)) + ' kg × 3</p>';
+    return '<p class="warm"><b>Isınma</b> ' + fmt(roundStep(w * 0.5, stepOf(e))) + ' kg × 6 · ' + fmt(roundStep(w * 0.75, stepOf(e))) + ' kg × 3</p>';
   }
 
   /* today's target, from the last session: add a rep, or add weight once every set hit the top of the range */
   function targetLine(e, last, doc) {
     if (!last || !e.reps) { return ''; }
-    var lo = e.reps[0], hi = e.reps[1], leg = PROGRAM[sel].type === 'leg';
+    var lo = e.reps[0], hi = e.reps[1];
     var parts = e.parts.map(function (pn, p) {
       var rs = last.map(function (s) { return s.r[p]; }).filter(function (r) { return r !== null && r !== undefined; });
       if (!rs.length) { return ''; }
@@ -1608,7 +1617,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       var minR = Math.min.apply(null, rs);
       var pre = e.parts.length > 1 ? pn.split(' ')[0] + ' ' : '';
       function wt(x) { return x ? (e.bw ? '+' : '') + fmt(x) + ' kg × ' : ''; }
-      if (partTop(e, last, p)) { return pre + wt(w + (e.bw ? 2.5 : (leg ? 5 : 2.5))) + lo + '–' + hi + ' tekrar (kilo artır)'; }
+      if (partTop(e, last, p)) { return pre + wt(w + incOf(e)) + lo + '–' + hi + ' tekrar (kilo artır)'; }
       if (minR < lo) { return pre + wt(w) + lo + '+ tekrar (önce aralığa gir)'; }
       return pre + wt(w) + (minR + 1) + '+ tekrar (geçen seferden 1 fazla)';
     }).filter(Boolean);
@@ -1704,7 +1713,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       /* weight coaching under each finished set */
       var fb = card.querySelector('.fb[data-j="' + j + '"]');
       if (!fb) { return; }
-      var adv = adviceFor(e, s, PROGRAM[sel].type === 'leg');
+      var adv = adviceFor(e, s);
       if (!adv) { fb.hidden = true; fb.innerHTML = ''; return; }
       var nextJ = -1;
       for (var k = j + 1; k < arr.length; k++) { if (!arr[k].d) { nextJ = k; break; } }
@@ -1733,8 +1742,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     var hint = card.querySelector('.hint');
     var show = hitTop(e, arr);
     if (show) {
-      var leg = PROGRAM[sel].type === 'leg';
-      hint.textContent = 'Tüm setlerde ' + e.reps[1] + ' tekrara ulaştın. Gelecek sefer ' + (e.bw ? 'ek ağırlık tak.' : 'ağırlığı ' + (leg ? '5' : '2,5') + ' kg artır.');
+      hint.textContent = 'Tüm setlerde ' + e.reps[1] + ' tekrara ulaştın. Gelecek sefer ' + (e.bw ? 'ek ağırlık tak.' : 'ağırlığı ' + fmt(incOf(e)) + ' kg artır.');
     }
     hint.hidden = !show;
   }
@@ -2511,7 +2519,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
   }
   /* "Bugün hazır": exercises whose last session hit the top of the range (double progression), else last volume */
   function readyHTML(day, doc) {
-    var out = [], leg = day.type === 'leg';
+    var out = [];
     day.ex.forEach(function (e) {
       var last = statusLast(e.id, today);
       if (!last) { return; }
@@ -2519,7 +2527,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
         if (out.length >= 2 || !partTop(e, last, p)) { return; }
         var w = 0;
         last.forEach(function (s) { if (s.w[p] && s.w[p] > w) { w = s.w[p]; } });
-        var next = w + (e.bw ? 2.5 : (leg ? 5 : 2.5));
+        var next = w + incOf(e);
         out.push(esc(pn) + ': ' + (e.bw ? '+' + fmt(next) + ' kg ek ağırlık tak' : fmt(next) + ' kg’a çık'));
       });
     });
@@ -2978,7 +2986,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
       }
       else if (pr && !pr.hidden) { toast('Yeni rekor: ' + e.name, { ms: 6000 }); }
       else {
-        var adv = adviceFor(e, s, PROGRAM[sel].type === 'leg');
+        var adv = adviceFor(e, s);
         if (adv && adv.kind === 'up') { toast('Kilo hafif kaldı' + (adv.w !== null ? ', ' + fmt(adv.w) + ' kg’a çık.' : '.'), { ms: 6000 }); }
         else if (adv && adv.kind === 'down') { toast('Kilo ağır geldi' + (adv.w ? ', ' + fmt(adv.w) + ' kg’a düş.' : '.'), { ms: 6000 }); }
       }
