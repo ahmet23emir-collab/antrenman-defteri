@@ -517,7 +517,6 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
 .bm-fig svg { width: 100%; max-width: 160px; height: auto; display: block; }
 .bm-fig span { font-size: .8rem; font-weight: 600; color: var(--ink-2); }
 .bm-sil { fill: var(--figure); stroke: var(--figure-line); stroke-width: 1.2; }
-.bm-off { fill: var(--figure-line); opacity: .6; }
 .bm-spine { fill: none; stroke: var(--figure-line); stroke-width: 1.2; stroke-linecap: round; }
 .bm-m { fill: var(--heat); stroke: transparent; stroke-width: 12; cursor: pointer; paint-order: stroke; animation: bm-in .7s ease backwards; }
 @keyframes bm-in { from { opacity: 0; } }
@@ -737,15 +736,17 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     'dips': ['Hafif öne eğil, omuz dirsek hizasına gelene kadar in. Omuzlar kulağa kalkmasın. Omuz ağrırsa derinliği azalt.', 'Destekli dips makinesi ya da decline press.'],
     'rear-delt-fly': ['Kablolar çapraz, kollar hafif bükük. Dirsekle dışa ve geriye aç, kürekleri fazla sıkma.', 'Reverse pec deck.']
   };
-  var MUS_NAMES = ['Göğüs', 'Sırt', 'Omuz', 'Biceps', 'Triceps', 'Ön bacak', 'Arka bacak', 'Baldır', 'Karın'];
+  var MUS_NAMES = ['Göğüs', 'Sırt', 'Omuz', 'Biceps', 'Triceps', 'Ön bacak', 'Arka bacak', 'Baldır', 'Karın', 'Kalça'];
+  /* weekly targets set by the coach instead of summed from the program (Kalça: 8 sets) */
+  var MUS_TARGET = { 9: 8 };
   var MUS = {
     'chest-press': [[0, 1], [4, 0.5], [2, 0.5]], 'smith-incline': [[0, 1], [2, 0.5], [4, 0.5]], 'chest-fly': [[0, 1]],
     'shoulder-press': [[2, 1], [4, 0.5]], 'lateral-raise': [[2, 1]], 'rear-delt-fly': [[2, 1]],
-    'pushdown': [[4, 1]], 'oh-cable': [[4, 1]], 'rdl': [[6, 1], [1, 0.5]], 'pulldown': [[1, 1], [3, 0.5]], 'dips': [[0, 1], [4, 1], [2, 0.5]],
+    'pushdown': [[4, 1]], 'oh-cable': [[4, 1]], 'rdl': [[6, 1], [1, 0.5], [9, 1]], 'pulldown': [[1, 1], [3, 0.5]], 'dips': [[0, 1], [4, 1], [2, 0.5]],
     'pullup': [[1, 1], [3, 0.5]], 'chinup': [[1, 1], [3, 0.5]], 'wide-row': [[1, 1], [3, 0.5]], 'cable-row': [[1, 1], [3, 0.5]],
     'incline-curl': [[3, 1]], 'cable-curl': [[3, 1]], 'ss-hammer-reverse': [[3, 1]],
     'hanging-leg-raise': [[8, 1]], 'cable-crunch': [[8, 1]],
-    'leg-press': [[5, 1], [6, 0.5]], 'smith-squat': [[5, 1], [6, 0.5]], 'leg-ext': [[5, 1]], 'leg-curl': [[6, 1]], 'calf-raise': [[7, 1]]
+    'leg-press': [[5, 1], [6, 0.5], [9, 1]], 'smith-squat': [[5, 1], [6, 0.5], [9, 1]], 'leg-ext': [[5, 1]], 'leg-curl': [[6, 1]], 'calf-raise': [[7, 1]]
   };
 
   /* every distinct exercise, for the progress chart */
@@ -2167,7 +2168,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     /* weekly sets per muscle: shared with the body map */
     var wm = weekMuscle(), doneM = wm.done, planM = wm.plan;
     /* bar colour by muscle group: push, pull, legs; core grey. A check marks a muscle that reached its weekly plan. */
-    var MUS_GROUP = ['push', 'pull', 'push', 'pull', 'push', 'leg', 'leg', 'leg', 'rest'];
+    var MUS_GROUP = ['push', 'pull', 'push', 'pull', 'push', 'leg', 'leg', 'leg', 'rest', 'leg'];
     h += '<section class="card macro"><span class="lbl">Bu hafta kas başına set (yapılan / programdaki)</span>' +
       MUS_NAMES.map(function (nm, i) {
         var pct = planM[i] ? Math.min(100, Math.round(doneM[i] / planM[i] * 100)) : 0;
@@ -2254,7 +2255,7 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
     Object.keys(set).forEach(function (k) {
       var pts = set[k];
       if (sx === 'f' && k === 'gogus') { pts = pts.map(function (q) { return [q[0], q[1] + 4]; }); }
-      g += k === 'kalca' ? '<g class="bm-off">' + pair(pts) + '</g>' : M(k, pair(pts));
+      g += M(k, pair(pts));
     });
     if (side === 'front') {
       var abs = '';
@@ -2283,10 +2284,11 @@ button:not(:disabled):active, label.btn:active { transform: scale(.97); transiti
         (MUS[e.id] || []).forEach(function (m) { done[m[0]] += n * m[1]; });
       });
     });
+    Object.keys(MUS_TARGET).forEach(function (k) { plan[+k] = MUS_TARGET[k]; });
     return { done: done, plan: plan };
   }
-  /* figure muscle -> index in MUS_NAMES (glutes have no group in the program's map, so they stay neutral) */
-  var BM = { gogus: 0, sirt: 1, omuz: 2, biceps: 3, triceps: 4, quad: 5, ham: 6, baldir: 7, karin: 8 };
+  /* figure muscle -> index in MUS_NAMES */
+  var BM = { gogus: 0, sirt: 1, omuz: 2, biceps: 3, triceps: 4, quad: 5, ham: 6, baldir: 7, karin: 8, kalca: 9 };
   var bmSel = 'gogus';
   function halfSet(v) { return fmt(Math.round(v * 2) / 2); }
   function bmRatio(wm, i) { return wm.plan[i] ? Math.min(1, wm.done[i] / wm.plan[i]) : 0; }
