@@ -530,6 +530,49 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
 .bm-chip { appearance: none; cursor: pointer; min-height: 2.75rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: transparent; font: inherit; font-size: .88rem; font-weight: 600; color: var(--ink); text-align: left; }
 .bm-chip em { font-style: normal; color: var(--ink-2); font-weight: 600; font-size: .82rem; font-variant-numeric: tabular-nums; }
 .bm-chip[aria-pressed="true"] { border-color: var(--done); background: var(--surface-2); }
+/* GÖREV 10: Bugün screen */
+.land { display: flex; flex-direction: column; gap: 14px; min-height: calc(100dvh - 4rem - 96px - env(safe-area-inset-bottom, 0px)); }
+.greet { margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--ink-2); }
+.today { position: relative; overflow: hidden; border-radius: 24px; padding: 22px 18px 20px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 4px; }
+.today[data-type="push"] { --day: var(--push); } .today[data-type="pull"] { --day: var(--pull); } .today[data-type="leg"] { --day: var(--leg); } .today[data-type="rest"] { --day: var(--rest); }
+.today::before { content: ""; position: absolute; inset: 0; background: radial-gradient(90% 110% at 100% 0%, color-mix(in srgb, var(--day) 34%, transparent), color-mix(in srgb, var(--day) 10%, transparent) 45%, transparent 75%); pointer-events: none; }
+.today > * { position: relative; }
+.today-t { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(3rem, 15vw, 4.2rem); line-height: .92; letter-spacing: .005em; text-wrap: balance; }
+.today-m { margin: 8px 0 0; font-size: 1rem; font-weight: 600; color: var(--ink-2); max-width: 34ch; }
+.ready { display: grid; gap: 6px; padding: 0 4px; }
+.ready p { margin: 0; display: flex; align-items: baseline; gap: 10px; font-weight: 600; font-size: .98rem; }
+.ready p::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); transform: translateY(-1px); }
+.wkc { gap: 12px; }
+.wdots { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.wdd { display: grid; justify-items: center; gap: 6px; }
+.wdd i { position: relative; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink-2); }
+.wdd i::after { content: ""; position: absolute; inset: -2px; border-radius: 50%; background: var(--accent); transform: scale(0); }
+.wdd i.on { border-color: var(--accent); }
+.wdd i.on::after { transform: scale(1); }
+.wdd i.now { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--ink); }
+.wdd i.fut { opacity: .45; }
+.wdd i.pop::after { animation: dot-fill .6s cubic-bezier(.2,1.5,.4,1) .35s backwards; }
+@keyframes dot-fill { from { transform: scale(0); } }
+.wdd em { font-style: normal; font-size: .75rem; font-weight: 600; color: var(--ink-2); }
+.wrow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.wrow b { font-weight: 700; }
+.wrow span { font-size: .85rem; color: var(--ink-2); }
+.land-more { align-self: flex-start; }
+.go-wrap { margin-top: auto; position: sticky; bottom: calc(4rem + env(safe-area-inset-bottom, 0px) + 12px); z-index: 5; padding-top: 6px; }
+.btn.go { min-height: 3.75rem; font-size: 1.15rem; border-radius: 18px; }
+.restc .rc-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.rc-big { display: block; font-family: var(--font-display); font-weight: 800; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.rc-big small { font-size: 1rem; color: var(--ink-2); }
+.rc-water { appearance: none; cursor: pointer; min-height: 2.75rem; padding: 0 16px; border: 0; border-radius: 12px; background: var(--water); color: var(--on-water); font: inherit; font-weight: 700; }
+/* finish screen */
+.fin { position: relative; overflow: hidden; border-radius: 24px; padding: 22px 18px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 14px; }
+.fin-t { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(2.8rem, 14vw, 3.8rem); line-height: .95; }
+.fdiff { font-size: .9rem; font-weight: 600; color: var(--ink-2); }
+.fdiff.up { color: var(--done); }
+.frec ul { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.frec li { display: flex; align-items: baseline; gap: 10px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.frec li::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); transform: translateY(-1px); }
+.fin-ring { border-color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } .wb-bubble, .wb-burst, .wb-ring, .medal-pop .spark { display: none !important; } .medal-pop.play svg.md { opacity: 1; } }
 </style>
 </head>
@@ -1750,7 +1793,10 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     }
   }
 
+  var finishFresh = false;
   function renderTraining() {
+    if (todayMode === 'finish' && finishKey && log[finishKey]) { view.innerHTML = finishHTML(finishKey, finishFresh); finishFresh = false; return; }
+    if (todayMode !== 'workout' && wantLanding()) { view.innerHTML = landingHTML(); return; }
     view.innerHTML = '<div id="week" class="brief-w"></div><div id="strip" class="strip"></div><div id="day"></div>';
     renderWeek(); renderStrip(); renderDay();
   }
@@ -2067,12 +2113,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     var lifts = docs.filter(function (d) { return PROGRAM[idxOfSid(d.s)].type !== 'rest'; });
     var last30 = lifts.filter(function (d) { return dayDiff(today, d.date) < 30; });
     var vol30 = last30.reduce(function (a, d) { return a + docStats(d, PROGRAM[idxOfSid(d.s)]).vol; }, 0);
-    var weeks = 0, ws = weekStart;
-    while (lifts.some(function (d) { return d.date >= ws && d.date <= addDays(ws, 6); })) { weeks++; ws = addDays(ws, -7); }
-    if (!weeks) {
-      ws = addDays(weekStart, -7);
-      while (lifts.some(function (d) { return d.date >= ws && d.date <= addDays(ws, 6); })) { weeks++; ws = addDays(ws, -7); }
-    }
+    var weeks = weekStreak(); /* weeks in a row that hit the program's target, same as the Bugün screen */
 
     var h = histSeg();
     h += '<section class="sum-grid"><div><b>' + last30.length + '</b><span>antrenman · 30 gün</span></div>' +
@@ -2383,6 +2424,185 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     return h;
   }
 
+  /* ================= Bugün (landing) and finish screens ================= */
+  /* landing: the Antrenman tab's first view. A running session or an edit goes straight to the workout. */
+  var todayMode = null, finishKey = null, landGrid = false, landPicked = false; /* landPicked: the user chose a session on the landing */
+  function wantLanding() {
+    if (editKey) { return false; }
+    var day = PROGRAM[sel], doc = findDoc(day.sid);
+    return !(day.type !== 'rest' && !doc.fin && doneCount(doc, day) > 0);
+  }
+  function liftTarget() { return SESSIONS.filter(function (i) { return PROGRAM[i].type !== 'rest'; }).length; }
+  /* same count as the week line above the workout ("Bu hafta 2/5") */
+  function weekDoneN() { return SESSIONS.filter(function (i) { return PROGRAM[i].type !== 'rest' && statusOf(i).st === 'done'; }).length; }
+  function weekMet(ws) {
+    var we = addDays(ws, 6), n = 0;
+    SESSIONS.forEach(function (i) {
+      var day = PROGRAM[i];
+      if (day.type === 'rest') { return; }
+      if (liveDocs().some(function (d) { return d.s === day.sid && d.fin && d.date >= ws && d.date <= we; })) { n++; }
+    });
+    return n >= liftTarget();
+  }
+  /* weekly streak: consecutive weeks that hit the target; the running week only adds once it is met */
+  function weekStreak() {
+    var n = 0, ws = weekStart;
+    if (weekDoneN() < liftTarget()) { ws = addDays(ws, -7); } else { n = 1; ws = addDays(ws, -7); }
+    while (n < 520 && weekMet(ws)) { n++; ws = addDays(ws, -7); }
+    return n;
+  }
+  function weekDotsHTML(popToday) {
+    var names = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'], h = '<div class="wdots" role="img" aria-label="Bu haftanın günleri">';
+    for (var i = 0; i < 7; i++) {
+      var d = addDays(weekStart, i), on = d <= today && trainedOn(d);
+      h += '<span class="wdd"><i class="' + (on ? 'on' : '') + (d === today ? ' now' : '') + (d > today ? ' fut' : '') + (on && popToday && d === today ? ' pop' : '') + '"></i><em>' + names[i] + '</em></span>';
+    }
+    var st = weekStreak();
+    return h + '</div><div class="wrow"><b>Bu hafta ' + weekDoneN() + '/' + liftTarget() + '</b><span>' + (st ? st + ' hafta üst üste' : 'Hedefi tutturduğun hafta seriye eklenir') + '</span></div>';
+  }
+  function sessionMinutes(day, doc) {
+    var sec = day.ex.reduce(function (a, e) { return a + setCount(doc, e) * ((e.rest || 90) + 40); }, 0);
+    return Math.max(5, Math.round(sec / 300) * 5);
+  }
+  /* last finished (not running) session of this type, before `doc` */
+  function prevSameType(sid, doc) {
+    var me = doc ? keyOf(doc.date, doc.s) : null, best = null;
+    liveDocs().forEach(function (d) {
+      var i = idxOfSid(d.s);
+      if (d.s !== sid || keyOf(d.date, d.s) === me || isOpen(d) || i < 0 || doneCount(d, PROGRAM[i]) === 0) { return; }
+      if (doc && (d.date > doc.date || (d.date === doc.date && d.u > doc.u))) { return; }
+      if (!best || d.date > best.date || (d.date === best.date && d.u > best.u)) { best = d; }
+    });
+    return best;
+  }
+  /* "Bugün hazır": exercises whose last session hit the top of the range (double progression), else last volume */
+  function readyHTML(day, doc) {
+    var out = [], leg = day.type === 'leg';
+    day.ex.forEach(function (e) {
+      var last = statusLast(e.id, today);
+      if (!last) { return; }
+      e.parts.forEach(function (pn, p) {
+        if (out.length >= 2 || !partTop(e, last, p)) { return; }
+        var w = 0;
+        last.forEach(function (s) { if (s.w[p] && s.w[p] > w) { w = s.w[p]; } });
+        var next = w + (e.bw ? 2.5 : (leg ? 5 : 2.5));
+        out.push(esc(pn) + ': ' + (e.bw ? '+' + fmt(next) + ' kg ek ağırlık tak' : fmt(next) + ' kg’a çık'));
+      });
+    });
+    if (!out.length) {
+      var prev = prevSameType(day.sid, null);
+      if (!prev) { return ''; }
+      var vol = docStats(prev, PROGRAM[idxOfSid(prev.s)]).vol;
+      if (!vol) { return ''; }
+      out.push('Geçen sefer ' + Math.round(vol).toLocaleString('tr-TR') + ' kg kaldırdın, bugün geç.');
+    }
+    return '<section class="ready" aria-label="Bugün hazır"><span class="lbl">Bugün hazır</span>' + out.map(function (t) { return '<p>' + t + '</p>'; }).join('') + '</section>';
+  }
+  function landGridHTML() {
+    if (!landGrid) { return ''; }
+    var next = suggest();
+    return '<div class="rgrid">' + SESSIONS.map(function (i) {
+      var day = PROGRAM[i], r = statusOf(i);
+      var line = r.st === 'done' ? CHECK + shortDate(r.date) : (r.st === 'part' ? 'Yarım kaldı' : (i === next ? 'Sıradaki' : 'Bekliyor'));
+      return '<button type="button" class="wk st-' + r.st + (i === next ? ' next' : '') + '" data-i="' + i + '" aria-pressed="' + (i === sel) + '"><span class="pl" style="--c:var(--' + day.type + ')"></span><span class="dtx"><b>' + titleCase(day.title) + '</b><span>' + line + '</span></span></button>';
+    }).join('') + '</div>';
+  }
+  function restCardHTML() {
+    var dd = daily[today], w = dd ? dd.water : 0, wg = waterGoal(today);
+    return '<section class="card restc"><div class="rc-row"><div><span class="lbl">Su</span><b class="rc-big">' + liters(w) + ' <small>/ ' + liters(wg) + ' L</small></b></div>' +
+      '<button type="button" class="rc-water" data-act="water" data-v="250">+250 ml</button></div>' +
+      '<div class="bar2" style="--c:var(--water)"><i style="width:' + Math.min(100, Math.round(w / wg * 100)) + '%"></i></div>' +
+      '<div class="row2"><div style="display:grid;gap:4px"><label class="lbl" for="steps-in">Adım</label><label class="fld"><input id="steps-in" type="text" inputmode="numeric" autocomplete="off" aria-label="Bugünkü adım" placeholder="Adım" value="' + (dd && dd.steps ? dd.steps : '') + '"><span>adım</span></label></div>' +
+      '<p class="muted" style="align-self:end">Hafif yürüyüş toparlanmayı hızlandırır. 7.000–10.000 adım yeterli.</p></div></section>';
+  }
+  function greeting() { var h = new Date().getHours(); return h < 12 ? 'Günaydın' : (h < 18 ? 'İyi günler' : 'İyi akşamlar'); }
+  function landingHTML() {
+    var day = PROGRAM[sel], doc = findDoc(day.sid), next = suggest();
+    var doneToday = day.type !== 'rest' && doc.fin && doc.date === today && doneCount(doc, day) > 0;
+    var weekDone = next < 0 && !doneToday && day.type !== 'rest' && !landPicked;
+    var restDay = day.type === 'rest' || doneToday || weekDone;
+    var h = '<div class="land"><p class="greet">' + greeting() + '</p>';
+    if (!restDay) {
+      h += '<section class="today" data-type="' + day.type + '"><span class="lbl">Bugün</span><h1 class="today-t">' + titleCase(day.title) + '</h1>' +
+        '<p class="today-m">' + day.ex.length + ' hareket · ~' + sessionMinutes(day, doc) + ' dk</p></section>';
+      h += readyHTML(day, doc);
+    } else {
+      var title, sub;
+      if (doneToday) {
+        var st = docStats(doc, day);
+        title = 'Bugün tamam';
+        sub = titleCase(day.title) + (st.dur ? ' · ' + st.dur + ' dk' : '') + ' · ' + Math.round(st.vol).toLocaleString('tr-TR') + ' kg. Toparlanma başladı, kaslar bugün büyüyor.';
+      } else {
+        title = day.type === 'rest' ? titleCase(day.title) : 'Toparlanma günü';
+        sub = (day.type === 'rest' ? 'Toparlanma günü. ' : '') + 'Kaslar bugün büyüyor.';
+      }
+      h += '<section class="today" data-type="rest"><span class="lbl">Bugün</span><h1 class="today-t">' + title + '</h1><p class="today-m">' + sub + '</p></section>';
+      h += restCardHTML();
+    }
+    h += '<section class="card wkc">' + weekDotsHTML(false) + '</section>';
+    h += '<button type="button" class="mini land-more" data-act="land-grid" aria-expanded="' + landGrid + '">' + (landGrid ? 'Listeyi kapat' : 'Başka antrenman seç') + '</button>' + landGridHTML();
+    var go = '';
+    if (doneToday) { go = '<button type="button" class="btn go" data-act="fin-open">Özeti aç</button>'; }
+    else if (!restDay || day.sid === 'cardio') { go = '<button type="button" class="btn go" data-act="start">Başla</button>'; }
+    if (go) { h += '<div class="go-wrap">' + go + '</div>'; }
+    return h + '</div>';
+  }
+  /* records broken in one session: same rule as the set card's Rekor tag (estimated 1RM beats every other session) */
+  function sessionRecords(doc, day) {
+    var key = keyOf(doc.date, doc.s), out = [];
+    day.ex.forEach(function (e) {
+      if (e.bw) { return; }
+      e.parts.forEach(function (pn, p) {
+        var before = bestSet(e.id, p, key).v, top = null;
+        setsOf(doc, e).forEach(function (s) {
+          if (s.d && s.w[p] && s.r[p]) { var v = e1rm(s.w[p], s.r[p]); if (before > 0 && v > before + 0.01 && (!top || v > top.v)) { top = { v: v, w: s.w[p], r: s.r[p] }; } }
+        });
+        if (top) { out.push(esc(pn) + ' · ' + fmt(top.w) + ' kg × ' + fmt(top.r)); }
+      });
+    });
+    return out;
+  }
+  function finishHTML(key, fresh) {
+    var doc = log[key];
+    if (!doc) { return landingHTML(); }
+    var day = PROGRAM[idxOfSid(doc.s)], st = docStats(doc, day), prev = prevSameType(doc.s, doc);
+    var diff = '';
+    if (prev) {
+      var pv = docStats(prev, PROGRAM[idxOfSid(prev.s)]).vol;
+      if (pv > 0) {
+        var pc = Math.round((st.vol - pv) / pv * 100);
+        diff = '<span class="fdiff' + (pc > 0 ? ' up' : '') + '">' + (pc > 0 ? '+%' + pc : (pc < 0 ? '−%' + Math.abs(pc) : 'aynı')) + ' önceki ' + titleCase(day.title) + ' seansına göre</span>';
+      }
+    }
+    var recs = sessionRecords(doc, day);
+    var h = '<div class="land"><section class="fin" id="fin-card"><span class="lbl">' + titleCase(day.title) + ' · ' + longDate(doc.date) + '</span><h1 class="fin-t">Antrenman tamam</h1>' +
+      '<div class="sum-grid two"><div><b>' + (st.dur ? st.dur : '–') + '</b><span>dakika</span></div><div><b>' + Math.round(st.vol).toLocaleString('tr-TR') + '</b><span>kg hacim · ' + st.sets + ' set</span></div></div>' + diff;
+    if (recs.length) { h += '<div class="frec"><span class="lbl">Bu seansta rekor</span><ul>' + recs.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul></div>'; }
+    h += '</section><section class="card wkc">' + weekDotsHTML(fresh) + '</section>';
+    return h + '<div class="go-wrap"><button type="button" class="btn go" data-act="fin-close">Tamam</button></div></div>';
+  }
+  /* one ~1 s burst of light on a fresh finish; nothing under reduced motion */
+  function finishBurst() {
+    if (wbReduce()) { return; }
+    var card = document.getElementById('fin-card');
+    if (!card) { return; }
+    var r = card.getBoundingClientRect(), cx = r.width * 0.5, cy = 70;
+    var ring = document.createElement('span');
+    ring.className = 'wb-ring fin-ring';
+    ring.style.cssText = 'left:' + (cx - 70) + 'px;top:' + (cy - 70) + 'px;width:140px;height:140px';
+    var burst = document.createElement('span');
+    burst.className = 'wb-burst';
+    burst.style.left = cx + 'px'; burst.style.top = cy + 'px';
+    var colors = ['var(--accent)', 'var(--gold)', 'var(--day, var(--accent))', 'var(--ink-2)'], html = '';
+    for (var i = 0; i < 16; i++) {
+      var a = (i / 16) * Math.PI * 2, d = 70 + Math.random() * 50;
+      html += '<i style="--c:' + colors[i % 4] + ';--x:' + (Math.cos(a) * d).toFixed(0) + 'px;--y:' + (Math.sin(a) * d * 0.7).toFixed(0) + 'px;--r:' + (Math.random() * 360).toFixed(0) + 'deg"></i>';
+    }
+    burst.innerHTML = html;
+    card.appendChild(ring); card.appendChild(burst);
+    setTimeout(function () { ring.remove(); burst.remove(); }, 1100);
+  }
+
   /* ================= render dispatcher ================= */
   function render() {
     needsRender = false;
@@ -2405,6 +2625,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     if (TABS.indexOf(t) < 0) { t = 'antrenman'; }
     tab = t; vd = today; pickMeal = null;
     if (t !== 'antrenman') { editKey = null; }
+    if (t === 'antrenman') { todayMode = null; landGrid = false; landPicked = false; }
     closeSheet();
     if (push) { try { history.replaceState(null, '', '#' + t); } catch (e) { try { location.hash = t; } catch (e2) {} } }
     render();
@@ -2520,7 +2741,11 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     var bmg = ev.target.closest('.bm-m');
     if (bmg) { bmSelect(bmg.getAttribute('data-m')); return; }
     var wk = ev.target.closest('.wk');
-    if (wk) { sel = +wk.getAttribute('data-i'); editKey = null; briefOpen = false; renderDay(); renderWeek(); revealNextSet(false); return; }
+    if (wk) {
+      sel = +wk.getAttribute('data-i'); editKey = null; briefOpen = false;
+      if (!document.getElementById('day')) { landGrid = false; landPicked = true; render(); return; }
+      renderDay(); renderWeek(); revealNextSet(false); return;
+    }
     var chk = ev.target.closest('.set .chk');
     if (chk) { toggleSet(chk); return; }
     var b = ev.target.closest('[data-act]');
@@ -2528,7 +2753,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     var act = b.getAttribute('data-act');
     if (act === 'finish') {
       var fday = PROGRAM[sel], fdn = doneCount(cur, fday), ftot = totalSets(fday, cur), fdoc = cur;
-      var finishNow = function () { haptic([30, 90, 30]); fdoc.fin = true; fdoc.t1 = Date.now(); touch(fdoc); stopRest(); renderDay(); renderWeek(); };
+      var finishNow = function () { haptic([30, 90, 30]); fdoc.fin = true; fdoc.t1 = Date.now(); touch(fdoc); stopRest(); finishKey = keyOf(fdoc.date, fdoc.s); todayMode = 'finish'; finishFresh = true; render(); window.scrollTo(0, 0); finishBurst(); };
       if (fdn >= ftot) { finishNow(); }
       else {
         confirmSheet(fdn ? ftot + ' setten ' + fdn + '’' + possSuffix(fdn) + ' yapıldı. Yine de bitirelim mi?' : 'Hiç set işaretlenmedi. Yine de bitirelim mi?', 'Devam et', 'Bitir', finishNow);
@@ -2547,6 +2772,10 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     }
     else if (act === 'bm-pick') { bmSelect(b.getAttribute('data-m')); }
     else if (act === 'bm-sex') { profile.sex = b.getAttribute('data-v') === 'k' ? 'k' : 'e'; sexKnown = true; touchProfile(); render(); }
+    else if (act === 'start') { todayMode = 'workout'; render(); window.scrollTo(0, 0); revealNextSet(false); }
+    else if (act === 'land-grid') { landGrid = !landGrid; render(); }
+    else if (act === 'fin-open') { var fd = findDoc(PROGRAM[sel].sid); finishKey = keyOf(fd.date, fd.s); todayMode = 'finish'; finishFresh = false; render(); window.scrollTo(0, 0); }
+    else if (act === 'fin-close') { todayMode = null; render(); window.scrollTo(0, 0); }
     else if (act === 'brief') { briefOpen = !briefOpen; renderWeek(); }
     else if (act === 'edit-exit') { editKey = null; sel = startSel(); renderDay(); renderWeek(); window.scrollTo(0, 0); }
     else if (act === 'hist') { showDetail([b.getAttribute('data-k')]); }
@@ -2571,7 +2800,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     else if (act === 'water') {
       var pw = daily[vd] ? daily[vd].water : 0;
       addWater(+b.getAttribute('data-v'));
-      if (tab === 'antrenman') { renderStrip(); } else if (tab === 'takviye') { updateBottle(pw); } else { render(); }
+      if (tab === 'antrenman') { if (document.getElementById('strip')) { renderStrip(); } else { render(); } } else if (tab === 'takviye') { updateBottle(pw); } else { render(); }
     }
     else if (act === 'prot') { addProt(+b.getAttribute('data-v')); render(); }
     else if (act === 'supp-edit') { suppEdit = !suppEdit; render(); }
@@ -2898,7 +3127,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
   }
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState !== 'visible') { return; }
-    if (refreshDates()) { vd = today; editKey = null; sel = startSel(); softRender(); }
+    if (refreshDates()) { vd = today; editKey = null; todayMode = null; sel = startSel(); softRender(); }
     if (wantAwake) { keepAwake(); }
   });
 
