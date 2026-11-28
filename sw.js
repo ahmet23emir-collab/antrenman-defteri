@@ -2,7 +2,7 @@
    Uygulama dosyaları önbellekte; internet yokken önbellekten açılır.
    index.html "önce ağ" ile gelir, böylece yeni sürüm internet varken hemen alınır.
    Yeni sürüm yayınlarken VERSION'ı artır. */
-var VERSION = 'v8b';
+var VERSION = 'v9';
 var CACHE = 'antrenman-' + VERSION;
 var FONT_CACHE = 'antrenman-fonts';
 var CORE = [

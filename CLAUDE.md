@@ -152,3 +152,4 @@ Yeni görevler buraya eklenir, biten görev işaretlenir.
   - Commit 2 (görsel dil), sw.js 'v8b':
     6. Prototipin paleti ve görsel dili tüm uygulamaya (koyu öncelikli, vurgu limon yeşili, su camgöbeği, rekor altın); açık tema çalışır; tür renkleri yeni palete uyarlanır, ayırt edilebilir kalır, antrenman adı yazıyla da durur.
     7. Tüm renk çiftleri iki temada ölçülür: metin ≥ 4,5:1, grafik ≥ 3:1.
+- [x] GÖREV 9: iPhone titreşimi. Tüm titreşimler tek `haptic()` yardımcısından: navigator.vibrate varsa o (Android aynı), yoksa gizli `<input type="checkbox" switch>` etiketine tıklanarak iOS Taptic (tek atım = 1 tık, desen = ~90 ms arayla). Set ✓, su hedefi, dinlenme bitişi; rekor ve "Antrenmanı bitir" çift tık. Dinlenme bitişi: ses ilk dokunuşta açılır, arka plandaki müziği durdurmaz; halka limon yeşiliyle 2 kez nabız atar, "Sıradaki set" yazar; hareketi azalt açıksa sabit renk. sw.js 'v9'.

@@ -301,6 +301,10 @@ details.notes[open] summary::after { content: "–"; }
 .rr-track { fill: none; stroke: currentColor; stroke-opacity: .2; stroke-width: 6; }
 .rr-arc { fill: none; stroke: var(--bar-accent); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 169.65; stroke-dashoffset: 0; }
 .rest.end .rr-arc { opacity: 0; }
+/* rest over: the ring turns lime and beats twice (sound may be muted, iOS gives no haptic without a touch) */
+.rest.end .rr-track { stroke: var(--bar-accent); stroke-opacity: 1; }
+.rest.end .rest-ring { animation: end-beat .6s ease-in-out 2; }
+@keyframes end-beat { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.18); } }
 .rest-ring.pulse { animation: beat 1s ease-in-out infinite; }
 @keyframes beat { 0%, 100% { transform: scale(1); } 18% { transform: scale(1.08); } 36% { transform: scale(1); } 52% { transform: scale(1.04); } }
 .rest-time { font-family: var(--font-display); font-weight: 800; font-size: 2.2rem; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -1272,7 +1276,37 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     card.appendChild(ring); card.appendChild(burst);
     setTimeout(function () { ring.remove(); burst.remove(); }, 1100);
   }
-  function vibrate(pat) { try { if (navigator.vibrate) { navigator.vibrate(pat); } } catch (e) {} }
+  /* haptics: Android keeps navigator.vibrate; iOS Safari has none, so a hidden switch is toggled through its label,
+     which plays the Taptic "tick" on iOS 18+. One tick per pulse of the pattern, ~90 ms apart. iOS only allows it
+     inside a user gesture, so ticks fired from a timer (rest end) are silently skipped by the system. */
+  var hapticLabel = null;
+  function hapticSwitch() {
+    if (hapticLabel) { return hapticLabel; }
+    var lb = document.createElement('label');
+    lb.setAttribute('aria-hidden', 'true');
+    lb.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;clip-path:inset(50%)';
+    var inp = document.createElement('input');
+    inp.type = 'checkbox';
+    inp.setAttribute('switch', '');
+    inp.tabIndex = -1;
+    /* the label click would focus the switch: hand focus straight back so editing() and screen readers ignore it */
+    inp.addEventListener('focus', function () { inp.blur(); });
+    lb.appendChild(inp);
+    document.body.appendChild(lb);
+    hapticLabel = lb;
+    return lb;
+  }
+  function haptic(pat) {
+    try {
+      if (navigator.vibrate) { navigator.vibrate(pat); return; }
+      var n = Array.isArray(pat) ? Math.ceil(pat.length / 2) : 1;
+      var lb = hapticSwitch();
+      for (var i = 0; i < n; i++) {
+        if (i === 0) { lb.click(); } else { setTimeout(function () { lb.click(); }, i * 90); }
+      }
+    } catch (e) {}
+  }
+  function vibrate(pat) { haptic(pat); }
 
   /* ================= record medal (from prototip.html) ================= */
   var medalEl = document.getElementById('medal-pop'), medalT = 0;
@@ -2494,7 +2528,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     var act = b.getAttribute('data-act');
     if (act === 'finish') {
       var fday = PROGRAM[sel], fdn = doneCount(cur, fday), ftot = totalSets(fday, cur), fdoc = cur;
-      var finishNow = function () { fdoc.fin = true; fdoc.t1 = Date.now(); touch(fdoc); stopRest(); renderDay(); renderWeek(); };
+      var finishNow = function () { haptic([30, 90, 30]); fdoc.fin = true; fdoc.t1 = Date.now(); touch(fdoc); stopRest(); renderDay(); renderWeek(); };
       if (fdn >= ftot) { finishNow(); }
       else {
         confirmSheet(fdn ? ftot + ' setten ' + fdn + '’' + possSuffix(fdn) + ' yapıldı. Yine de bitirelim mi?' : 'Hiç set işaretlenmedi. Yine de bitirelim mi?', 'Devam et', 'Bitir', finishNow);
@@ -2656,9 +2690,9 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     if (on) {
       startRest(e.rest); keepAwake();
       btn.classList.remove('go'); void btn.offsetWidth; btn.classList.add('go');
-      vibrate(30);
       var pr = set.querySelector('.pr');
-      if (pr && !pr.hidden) { medalPop(); }
+      /* one tick for a set, a double tick when it is also a record */
+      if (pr && !pr.hidden) { haptic([30, 90, 30]); medalPop(); } else { haptic(30); }
       if (filled.length) {
         /* quick log from last session: mark it and offer an undo */
         filled.forEach(function (f) { autoMark[autoKey(sdoc, e.id, j, f.p, f.k)] = true; f.inp.setAttribute('data-auto', '1'); f.inp.classList.add('auto'); });
@@ -2769,10 +2803,16 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
     try {
       var AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) { return; }
+      /* 'ambient' mixes with music already playing instead of pausing it (Safari 17+) */
+      try { if (navigator.audioSession) { navigator.audioSession.type = 'ambient'; } } catch (e2) {}
       audioCtx = audioCtx || new AC();
       if (audioCtx.state === 'suspended') { audioCtx.resume(); }
     } catch (e) {}
   }
+  /* iOS only lets audio start inside a user gesture: unlock it on the first touch, and again if the system suspended it */
+  ['pointerdown', 'touchend', 'keydown'].forEach(function (evName) {
+    document.addEventListener(evName, function () { if (!audioCtx || audioCtx.state !== 'running') { primeAudio(); } }, { passive: true, capture: true });
+  });
   function beep() {
     try {
       if (!audioCtx) { return; }
@@ -2784,7 +2824,7 @@ button, summary, label, a, input, select, textarea, .chk { touch-action: manipul
         o.start(t + off); o.stop(t + off + 0.15);
       });
     } catch (e) {}
-    try { if (navigator.vibrate) { navigator.vibrate([200, 100, 200]); } } catch (e) {}
+    haptic([200, 100, 200]);
   }
   /* one SVG stroke drains per start or +15 sn (no seam); the last 10 seconds pulse */
   var RR_C = 2 * Math.PI * 27, rrArc = document.getElementById('rr-arc'), rrWrap = document.getElementById('rest-ring'), restTotal = 0;
